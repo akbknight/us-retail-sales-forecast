@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>US Retail Sales Forecast | Akshay Kumar</title>
+<meta name="description" content="18-month demand forecast for US Retail & Food Services Sales using Holt-Winters exponential smoothing on FRED data. By Akshay Kumar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<style>
+:root[data-theme="dark"] {
+  --bg: #0d0f14;
+  --bg-card: #13161e;
+  --bg-card2: #181c27;
+  --border: #1e2230;
+  --text: #e8e6e1;
+  --text-2: #9a9890;
+  --text-muted: #5a5850;
+  --accent: #e8a020;
+  --accent-dim: rgba(232,160,32,0.12);
+  --green: #22c55e;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --grid: rgba(255,255,255,0.04);
+  --shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+:root[data-theme="light"] {
+  --bg: #f8f7f4;
+  --bg-card: #ffffff;
+  --bg-card2: #f0ede8;
+  --border: #e0dbd2;
+  --text: #1a1814;
+  --text-2: #5a5248;
+  --text-muted: #9a9288;
+  --accent: #b37600;
+  --accent-dim: rgba(179,118,0,0.10);
+  --green: #16a34a;
+  --red: #dc2626;
+  --blue: #2563eb;
+  --grid: rgba(0,0,0,0.05);
+  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.25s, color 0.25s; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* --- Layout --- */
+header { border-bottom: 1px solid var(--border); padding: 18px 0; position: sticky; top: 0; background: var(--bg); z-index: 100; backdrop-filter: blur(8px); }
+.header-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
+.logo { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; color: var(--accent); letter-spacing: 0.05em; }
+.header-meta { display: flex; align-items: center; gap: 16px; }
+.theme-btn { background: none; border: 1px solid var(--border); color: var(--text-2); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: 'JetBrains Mono', monospace; transition: all 0.2s; }
+.theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+.source-badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); background: var(--bg-card); border: 1px solid var(--border); padding: 5px 10px; border-radius: 4px; }
+
+main { max-width: 1200px; margin: 0 auto; padding: 48px 24px 80px; }
+
+/* --- Hero --- */
+.hero { margin-bottom: 48px; }
+.hero-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px; }
+.hero h1 { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; color: var(--text); margin-bottom: 16px; }
+.hero-desc { font-size: 15px; color: var(--text-2); line-height: 1.7; max-width: 680px; }
+.hero-desc strong { color: var(--text); font-weight: 500; }
+
+/* --- KPI Cards --- */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px; }
+@media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .kpi-grid { grid-template-columns: 1fr; } }
+.kpi-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; position: relative; overflow: hidden; transition: border-color 0.2s; }
+.kpi-card:hover { border-color: var(--accent); }
+.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; }
+.kpi-card.actual::before { background: var(--blue); }
+.kpi-card.forecast::before { background: var(--accent); }
+.kpi-card.growth::before { background: var(--green); }
+.kpi-card.model::before { background: var(--text-muted); }
+.kpi-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+.kpi-value { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.03em; color: var(--text); line-height: 1; margin-bottom: 4px; }
+.kpi-card.forecast .kpi-value { color: var(--accent); }
+.kpi-card.growth .kpi-value { color: var(--green); }
+.kpi-sub { font-size: 12px; color: var(--text-muted); }
+
+/* --- Charts --- */
+.chart-section { margin-bottom: 40px; }
+.chart-header { margin-bottom: 16px; }
+.chart-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.chart-subtitle { font-size: 12px; color: var(--text-muted); }
+.chart-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: var(--shadow); }
+.chart-wrap { position: relative; }
+
+.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px; }
+@media (max-width: 768px) { .chart-row { grid-template-columns: 1fr; } }
+
+/* --- Legend --- */
+.legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-2); }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.legend-line { width: 16px; height: 2px; flex-shrink: 0; }
+.legend-band { width: 16px; height: 8px; border-radius: 2px; flex-shrink: 0; opacity: 0.5; }
+
+/* --- Methodology --- */
+.method-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 32px; margin-top: 48px; }
+.method-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 20px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em; }
+.method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+@media (max-width: 700px) { .method-grid { grid-template-columns: 1fr; } }
+.method-item h4 { font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+.method-item p { font-size: 13px; color: var(--text-2); line-height: 1.65; }
+.method-item code { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: var(--bg-card2); padding: 1px 5px; border-radius: 3px; color: var(--text); }
+
+/* --- Footer --- */
+footer { border-top: 1px solid var(--border); padding: 32px 24px; margin-top: 48px; }
+.footer-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.footer-left { font-size: 13px; color: var(--text-muted); }
+.footer-left strong { color: var(--text-2); font-weight: 500; }
+.footer-right { display: flex; gap: 16px; }
+.footer-link { font-size: 12px; color: var(--text-muted); }
+.footer-link:hover { color: var(--accent); }
+
+/* --- Annotation labels --- */
+.annotation-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <span class="logo">US Retail Sales Forecast</span>
+    <div class="header-meta">
+      <span class="source-badge">Source: FRED / RSAFS</span>
+      <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">Light</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <p class="hero-eyebrow">Demand Forecasting · Market Analysis</p>
+    <h1>US Retail &amp; Food Services Sales<br>18-Month Forward Forecast</h1>
+    <p class="hero-desc">
+      Holt-Winters triple exponential smoothing applied to <strong>135 months</strong> of seasonally adjusted retail sales data
+      from the Federal Reserve Bank of St. Louis. The model projects <strong>$789.2B in March 2027</strong> (+4.9% from current),
+      with a 95% confidence interval of <strong>$705B–$873B</strong>. Forecast uncertainty widens with horizon:
+      the 80% band captures plausible outcomes under stable macro conditions;
+      the 95% band accounts for demand shocks comparable to those observed in 2020–2021.
+    </p>
+  </div>
+
+  <!-- KPI Row -->
+  <div class="kpi-grid">
+    <div class="kpi-card actual">
+      <p class="kpi-label">Latest Actual</p>
+      <p class="kpi-value">$752.1B</p>
+      <p class="kpi-sub">March 2026 · RSAFS</p>
+    </div>
+    <div class="kpi-card forecast">
+      <p class="kpi-label">12-Month Forecast</p>
+      <p class="kpi-value">$789.2B</p>
+      <p class="kpi-sub">March 2027 · point estimate</p>
+    </div>
+    <div class="kpi-card growth">
+      <p class="kpi-label">Projected Change</p>
+      <p class="kpi-value">+4.9%</p>
+      <p class="kpi-sub">vs. March 2026 actual</p>
+    </div>
+    <div class="kpi-card model">
+      <p class="kpi-label">Model RMSE</p>
+      <p class="kpi-value">$12.4B</p>
+      <p class="kpi-sub">in-sample · 1.65% of mean</p>
+    </div>
+  </div>
+
+  <!-- Main Forecast Chart -->
+  <div class="chart-section">
+    <div class="chart-header">
+      <p class="chart-title">Historical Sales + 18-Month Forecast with Confidence Intervals</p>
+      <p class="chart-subtitle">Gray: model fit on historical data &nbsp;·&nbsp; Amber: point forecast &nbsp;·&nbsp; Bands: 80% and 95% predictive intervals</p>
+    </div>
+    <div class="chart-card">
+      <div class="chart-wrap"><canvas id="mainChart" height="340"></canvas></div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-line" style="background:#3b82f6"></div> Actual sales</div>
+        <div class="legend-item"><div class="legend-line" style="background:#6b7280"></div> Model fit</div>
+        <div class="legend-item"><div class="legend-line" style="background:#e8a020"></div> Point forecast</div>
+        <div class="legend-item"><div class="legend-band" style="background:#e8a020"></div> 80% CI</div>
+        <div class="legend-item"><div class="legend-band" style="background:#e8a020; opacity:0.2"></div> 95% CI</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two-column charts -->
+  <div class="chart-row">
+    <div>
+      <div class="chart-header">
+        <p class="chart-title">Year-over-Year Growth Rate</p>
+        <p class="chart-subtitle">COVID-19 shock: −19.7% (Apr 2020) · Recovery peak: +51.9% (Apr 2021)</p>
+      </div>
+      <div class="chart-card">
+        <div class="chart-wrap"><canvas id="yoyChart" height="260"></canvas></div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-header">
+        <p class="chart-title">Model Fit: Actual vs Fitted Values</p>
+        <p class="chart-subtitle">In-sample RMSE $12.4B · 1.65% of mean · AIC 2,577</p>
+      </div>
+      <div class="chart-card">
+        <div class="chart-wrap"><canvas id="fitChart" height="260"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Methodology -->
+  <div class="method-section">
+    <p class="method-title">// Methodology & Assumptions</p>
+    <div class="method-grid">
+      <div class="method-item">
+        <h4>Data</h4>
+        <p>FRED series <code>RSAFS</code> — Advance Retail and Food Services Sales, Seasonally Adjusted, monthly, millions of USD.
+        135 observations from Jan 2015 through Mar 2026.
+        <a href="https://fred.stlouisfed.org/series/RSAFS" target="_blank">Source →</a></p>
+      </div>
+      <div class="method-item">
+        <h4>Model</h4>
+        <p>Holt-Winters triple exponential smoothing with additive trend and additive seasonal components
+        (<code>statsmodels.tsa.holtwinters.ExponentialSmoothing</code>, <code>seasonal_periods=12</code>).
+        Parameters optimized by maximum likelihood. AIC: 2,577. Smoothing level α=1.0.</p>
+      </div>
+      <div class="method-item">
+        <h4>Uncertainty</h4>
+        <p>Predictive intervals derived from in-sample residual standard deviation ($12.4B) scaled by
+        <code>√h</code> where <em>h</em> is forecast horizon. 80% CI uses z=1.28; 95% CI uses z=1.96.
+        Intervals assume homoscedastic residuals and do not capture structural breaks.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <p class="footer-left">
+      Analysis by <strong>Akshay Kumar</strong> · Data: Federal Reserve Bank of St. Louis (FRED) ·
+      Methodology: Holt-Winters Exponential Smoothing · Python / statsmodels
+    </p>
+    <div class="footer-right">
+      <a href="https://github.com/akbknight/us-retail-sales-forecast" class="footer-link">GitHub</a>
+      <a href="https://www.linkedin.com/in/akshaykumardl/" class="footer-link">LinkedIn</a>
+      <a href="https://fred.stlouisfed.org/series/RSAFS" class="footer-link">FRED Data</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Real data from FRED RSAFS analysis ──────────────────────────────────────
+const HIST_DATES = ["2015-01-01","2015-02-01","2015-03-01","2015-04-01","2015-05-01","2015-06-01","2015-07-01","2015-08-01","2015-09-01","2015-10-01","2015-11-01","2015-12-01","2016-01-01","2016-02-01","2016-03-01","2016-04-01","2016-05-01","2016-06-01","2016-07-01","2016-08-01","2016-09-01","2016-10-01","2016-11-01","2016-12-01","2017-01-01","2017-02-01","2017-03-01","2017-04-01","2017-05-01","2017-06-01","2017-07-01","2017-08-01","2017-09-01","2017-10-01","2017-11-01","2017-12-01","2018-01-01","2018-02-01","2018-03-01","2018-04-01","2018-05-01","2018-06-01","2018-07-01","2018-08-01","2018-09-01","2018-10-01","2018-11-01","2018-12-01","2019-01-01","2019-02-01","2019-03-01","2019-04-01","2019-05-01","2019-06-01","2019-07-01","2019-08-01","2019-09-01","2019-10-01","2019-11-01","2019-12-01","2020-01-01","2020-02-01","2020-03-01","2020-04-01","2020-05-01","2020-06-01","2020-07-01","2020-08-01","2020-09-01","2020-10-01","2020-11-01","2020-12-01","2021-01-01","2021-02-01","2021-03-01","2021-04-01","2021-05-01","2021-06-01","2021-07-01","2021-08-01","2021-09-01","2021-10-01","2021-11-01","2021-12-01","2022-01-01","2022-02-01","2022-03-01","2022-04-01","2022-05-01","2022-06-01","2022-07-01","2022-08-01","2022-09-01","2022-10-01","2022-11-01","2022-12-01","2023-01-01","2023-02-01","2023-03-01","2023-04-01","2023-05-01","2023-06-01","2023-07-01","2023-08-01","2023-09-01","2023-10-01","2023-11-01","2023-12-01","2024-01-01","2024-02-01","2024-03-01","2024-04-01","2024-05-01","2024-06-01","2024-07-01","2024-08-01","2024-09-01","2024-10-01","2024-11-01","2024-12-01","2025-01-01","2025-02-01","2025-03-01","2025-04-01","2025-05-01","2025-06-01","2025-07-01","2025-08-01","2025-09-01","2025-10-01","2025-11-01","2025-12-01","2026-01-01","2026-02-01","2026-03-01"];
+const HIST_SALES = [428.21,427.12,433.65,434.47,437.87,437.95,441.94,441.85,439.87,438.69,440.3,442.15,439.47,443.12,441.86,444.25,445.49,450.24,449.79,449.95,453.06,453.85,453.89,459.31,464.41,464.28,463.67,465.28,462.75,465.13,465.09,466.02,475.72,476.11,480.95,483.59,481.41,484.03,484.11,484.15,491.96,490.23,493.14,493.44,491.51,496.42,498.85,489.11,490.44,491.75,499.29,499.34,504.74,505.25,509.09,512.56,509.28,510.65,514.22,515.87,515.12,515.33,468.32,401.03,478.45,518.04,526.3,530.74,541.3,539.11,533.94,538.55,559.23,544.89,603.58,608.96,605.28,611.95,601.82,605.53,609.67,618.57,624.87,619.94,631.51,638.1,651.03,660.19,659.85,666.11,659.55,663.57,661.85,668.67,659.46,651.76,680.25,672.15,665.07,670.49,673.9,677.12,678.42,684.75,689.4,686.15,685.33,686.28,680.46,685.28,687.64,687.6,692.77,692.45,698.84,697.04,703.05,708.29,711.85,717.26,711.26,711.58,723.35,721.79,716.1,723.03,727.73,731.7,732.19,731.05,734.72,734.72,734.5,739.77,752.06];
+const HIST_FIT  = [439.43,430.44,431.91,433.96,440.37,441.49,440.5,444.51,445.61,443.07,442.27,441.69,445.36,441.69,447.91,442.17,450.15,449.11,452.79,452.36,453.71,456.26,457.42,455.28,462.51,466.64,469.08,463.99,471.18,466.37,467.68,467.66,469.78,478.93,479.68,482.33,486.79,483.64,488.83,484.42,490.05,495.58,492.78,495.71,497.21,494.71,499.99,500.24,492.32,492.67,496.55,499.6,505.24,508.36,507.8,511.66,516.33,512.48,514.22,515.6,519.07,517.35,520.13,468.64,406.93,482.07,520.59,528.87,534.5,544.5,542.69,535.32,541.75,561.46,549.69,603.89,614.86,608.9,614.5,604.38,609.3,612.87,622.15,626.26,623.14,633.74,642.9,651.34,666.09,663.47,668.66,662.12,667.33,665.06,672.24,660.84,654.97,682.48,676.95,665.38,676.39,677.52,679.67,680.99,688.52,692.61,689.72,686.71,689.48,682.68,690.08,687.95,693.5,696.39,695.0,701.4,700.8,706.26,711.86,713.24,720.47,713.49,716.37,723.66,727.69,719.72,725.58,730.29,735.46,735.39,734.62,736.1,737.92,736.73,744.57];
+const FC_DATES  = ["2026-04-01","2026-05-01","2026-06-01","2026-07-01","2026-08-01","2026-09-01","2026-10-01","2026-11-01","2026-12-01","2027-01-01","2027-02-01","2027-03-01","2027-04-01","2027-05-01","2027-06-01","2027-07-01","2027-08-01","2027-09-01"];
+const FC_POINT  = [752.37,758.27,761.9,764.45,767.01,770.78,773.98,777.55,778.94,782.14,784.37,789.17,789.48,795.38,799.0,801.55,804.12,807.88];
+const FC_CI95U  = [776.67,792.64,803.98,813.04,821.35,830.3,838.27,846.28,851.83,858.98,864.96,873.34,877.09,886.3,893.11,898.75,904.3,910.97];
+const FC_CI95L  = [728.08,723.91,719.81,715.85,712.68,711.26,709.69,708.83,706.04,705.3,703.78,704.99,701.87,704.46,704.89,704.36,703.93,704.79];
+const FC_CI80U  = [768.24,780.72,789.38,796.18,802.5,809.65,815.96,822.44,826.54,832.32,837.0,844.14,846.69,854.75,860.46,865.03,869.55,875.21];
+const FC_CI80L  = [736.51,735.83,734.41,732.71,731.53,731.91,732.0,732.67,731.33,731.96,731.74,734.2,732.26,736.0,737.54,738.08,738.69,740.56];
+const YOY_DATES = ["2019-01-01","2019-02-01","2019-03-01","2019-04-01","2019-05-01","2019-06-01","2019-07-01","2019-08-01","2019-09-01","2019-10-01","2019-11-01","2019-12-01","2020-01-01","2020-02-01","2020-03-01","2020-04-01","2020-05-01","2020-06-01","2020-07-01","2020-08-01","2020-09-01","2020-10-01","2020-11-01","2020-12-01","2021-01-01","2021-02-01","2021-03-01","2021-04-01","2021-05-01","2021-06-01","2021-07-01","2021-08-01","2021-09-01","2021-10-01","2021-11-01","2021-12-01","2022-01-01","2022-02-01","2022-03-01","2022-04-01","2022-05-01","2022-06-01","2022-07-01","2022-08-01","2022-09-01","2022-10-01","2022-11-01","2022-12-01","2023-01-01","2023-02-01","2023-03-01","2023-04-01","2023-05-01","2023-06-01","2023-07-01","2023-08-01","2023-09-01","2023-10-01","2023-11-01","2023-12-01","2024-01-01","2024-02-01","2024-03-01","2024-04-01","2024-05-01","2024-06-01","2024-07-01","2024-08-01","2024-09-01","2024-10-01","2024-11-01","2024-12-01","2025-01-01","2025-02-01","2025-03-01","2025-04-01","2025-05-01","2025-06-01","2025-07-01","2025-08-01","2025-09-01","2025-10-01","2025-11-01","2025-12-01","2026-01-01","2026-02-01","2026-03-01"];
+const YOY_PCT   = [1.87,1.59,3.14,3.14,2.6,3.06,3.23,3.87,3.62,2.87,3.08,5.47,5.03,4.79,-6.2,-19.69,-5.21,2.53,3.38,3.55,6.29,5.57,3.84,4.4,8.56,5.74,28.88,51.85,26.51,18.13,14.35,14.09,12.63,14.74,17.03,15.11,12.92,17.11,7.86,8.41,9.01,8.85,9.59,9.58,8.56,8.1,5.53,5.13,7.72,5.34,2.16,1.56,2.13,1.65,2.86,3.19,4.16,2.61,3.92,5.3,0.03,1.95,3.39,2.55,2.8,2.26,3.01,1.79,1.98,3.23,3.87,4.52,4.53,3.84,5.19,4.97,3.37,4.42,4.13,4.97,4.14,3.21,3.21,2.43,3.27,3.96,3.97];
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+function fmtDate(s) {
+  const d = new Date(s + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+}
+function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
+function getVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+// ── Theme toggle ─────────────────────────────────────────────────────────────
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = current === 'dark' ? 'Dark' : 'Light';
+  updateChartThemes();
+}
+
+// ── Chart defaults ───────────────────────────────────────────────────────────
+Chart.defaults.font.family = "'JetBrains Mono', monospace";
+Chart.defaults.font.size = 10;
+
+function chartDefaults() {
+  return {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: isDark() ? '#1e2230' : '#ffffff',
+        borderColor: isDark() ? '#2a2d3a' : '#e0dbd2',
+        borderWidth: 1,
+        titleColor: isDark() ? '#e8e6e1' : '#1a1814',
+        bodyColor: isDark() ? '#9a9890' : '#5a5248',
+        padding: 10,
+        titleFont: { family: "'JetBrains Mono', monospace", size: 11 },
+        bodyFont: { family: "'Inter', sans-serif", size: 12 },
+      },
+    },
+    scales: {
+      x: {
+        grid: { color: isDark() ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)', drawTicks: false },
+        border: { display: false },
+        ticks: { color: isDark() ? '#5a5850' : '#9a9288', maxRotation: 0, autoSkip: true, maxTicksLimit: 8 },
+      },
+      y: {
+        grid: { color: isDark() ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)', drawTicks: false },
+        border: { display: false },
+        ticks: { color: isDark() ? '#5a5850' : '#9a9288' },
+      },
+    },
+  };
+}
+
+// ── Main forecast chart ──────────────────────────────────────────────────────
+const allDates = [...HIST_DATES, ...FC_DATES];
+const n = HIST_DATES.length;
+const nullArr = (len) => Array(len).fill(null);
+
+// Build joined datasets with null gaps
+const mainData = {
+  labels: allDates.map(fmtDate),
+  datasets: [
+    {
+      label: '95% CI upper',
+      data: [...nullArr(n - 1), HIST_SALES[n-1], ...FC_CI95U],
+      borderWidth: 0, pointRadius: 0,
+      backgroundColor: 'rgba(232,160,32,0.08)',
+      fill: '+1',
+      tension: 0.3,
+    },
+    {
+      label: '95% CI lower',
+      data: [...nullArr(n - 1), HIST_SALES[n-1], ...FC_CI95L],
+      borderWidth: 0, pointRadius: 0,
+      backgroundColor: 'rgba(232,160,32,0.08)',
+      fill: false,
+      tension: 0.3,
+    },
+    {
+      label: '80% CI upper',
+      data: [...nullArr(n - 1), HIST_SALES[n-1], ...FC_CI80U],
+      borderWidth: 0, pointRadius: 0,
+      backgroundColor: 'rgba(232,160,32,0.18)',
+      fill: '+1',
+      tension: 0.3,
+    },
+    {
+      label: '80% CI lower',
+      data: [...nullArr(n - 1), HIST_SALES[n-1], ...FC_CI80L],
+      borderWidth: 0, pointRadius: 0,
+      backgroundColor: 'rgba(232,160,32,0.18)',
+      fill: false,
+      tension: 0.3,
+    },
+    {
+      label: 'Model fit',
+      data: [...HIST_FIT, ...nullArr(FC_DATES.length)],
+      borderColor: 'rgba(156,163,175,0.5)',
+      borderWidth: 1.5,
+      borderDash: [4, 3],
+      pointRadius: 0,
+      fill: false,
+      tension: 0.3,
+    },
+    {
+      label: 'Actual sales',
+      data: [...HIST_SALES, ...nullArr(FC_DATES.length)],
+      borderColor: '#3b82f6',
+      borderWidth: 2,
+      pointRadius: 0,
+      fill: false,
+      tension: 0.3,
+    },
+    {
+      label: 'Forecast',
+      data: [...nullArr(n - 1), HIST_SALES[n-1], ...FC_POINT],
+      borderColor: '#e8a020',
+      borderWidth: 2.5,
+      pointRadius: 0,
+      fill: false,
+      tension: 0.3,
+    },
+  ],
+};
+
+const mainChart = new Chart(document.getElementById('mainChart'), {
+  type: 'line',
+  data: mainData,
+  options: {
+    ...chartDefaults(),
+    plugins: {
+      ...chartDefaults().plugins,
+      annotation: {
+        annotations: {
+          covidLine: {
+            type: 'line',
+            xMin: allDates.map(fmtDate).indexOf(fmtDate('2020-04-01')),
+            xMax: allDates.map(fmtDate).indexOf(fmtDate('2020-04-01')),
+            borderColor: 'rgba(239,68,68,0.5)',
+            borderWidth: 1,
+            borderDash: [4, 3],
+            label: { content: 'COVID shock', display: true, position: 'end', color: '#ef4444', font: { size: 9 }, backgroundColor: 'transparent', yAdjust: -8 }
+          },
+          splitLine: {
+            type: 'line',
+            xMin: allDates.map(fmtDate).indexOf(fmtDate('2026-04-01')),
+            xMax: allDates.map(fmtDate).indexOf(fmtDate('2026-04-01')),
+            borderColor: 'rgba(232,160,32,0.3)',
+            borderWidth: 1,
+            borderDash: [4, 3],
+            label: { content: 'Forecast start', display: true, position: 'end', color: '#e8a020', font: { size: 9 }, backgroundColor: 'transparent', yAdjust: -8 }
+          }
+        }
+      }
+    },
+    scales: {
+      ...chartDefaults().scales,
+      y: {
+        ...chartDefaults().scales.y,
+        title: { display: true, text: 'Billions USD', color: isDark() ? '#5a5850' : '#9a9288', font: { size: 10 } },
+        ticks: {
+          ...chartDefaults().scales.y.ticks,
+          callback: (v) => '$' + v + 'B',
+        },
+      },
+    },
+  },
+});
+
+// ── YoY Growth chart ─────────────────────────────────────────────────────────
+const yoyColors = YOY_PCT.map(v => v >= 0 ? 'rgba(34,197,94,0.7)' : 'rgba(239,68,68,0.7)');
+const yoyChart = new Chart(document.getElementById('yoyChart'), {
+  type: 'bar',
+  data: {
+    labels: YOY_DATES.map(fmtDate),
+    datasets: [{
+      label: 'YoY %',
+      data: YOY_PCT,
+      backgroundColor: yoyColors,
+      borderRadius: 2,
+    }],
+  },
+  options: {
+    ...chartDefaults(),
+    plugins: {
+      ...chartDefaults().plugins,
+      tooltip: {
+        ...chartDefaults().plugins.tooltip,
+        callbacks: { label: (ctx) => ` ${ctx.parsed.y > 0 ? '+' : ''}${ctx.parsed.y.toFixed(1)}%` },
+      },
+      annotation: {
+        annotations: {
+          zeroLine: { type: 'line', yMin: 0, yMax: 0, borderColor: 'rgba(255,255,255,0.15)', borderWidth: 1 }
+        }
+      }
+    },
+    scales: {
+      ...chartDefaults().scales,
+      y: {
+        ...chartDefaults().scales.y,
+        ticks: { ...chartDefaults().scales.y.ticks, callback: (v) => v + '%' },
+      },
+    },
+  },
+});
+
+// ── Fit Quality chart ────────────────────────────────────────────────────────
+const fitChart = new Chart(document.getElementById('fitChart'), {
+  type: 'line',
+  data: {
+    labels: HIST_DATES.map(fmtDate),
+    datasets: [
+      {
+        label: 'Actual',
+        data: HIST_SALES,
+        borderColor: '#3b82f6',
+        borderWidth: 2,
+        pointRadius: 0,
+        fill: false,
+        tension: 0.3,
+      },
+      {
+        label: 'Fitted',
+        data: HIST_FIT,
+        borderColor: 'rgba(232,160,32,0.7)',
+        borderWidth: 1.5,
+        borderDash: [3, 3],
+        pointRadius: 0,
+        fill: false,
+        tension: 0.3,
+      },
+    ],
+  },
+  options: {
+    ...chartDefaults(),
+    plugins: {
+      ...chartDefaults().plugins,
+    },
+    scales: {
+      ...chartDefaults().scales,
+      y: {
+        ...chartDefaults().scales.y,
+        ticks: { ...chartDefaults().scales.y.ticks, callback: (v) => '$' + v + 'B' },
+      },
+    },
+  },
+});
+
+// ── Update chart colors on theme change ──────────────────────────────────────
+function updateChartThemes() {
+  [mainChart, yoyChart, fitChart].forEach(c => {
+    c.options.scales.x.grid.color = isDark() ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)';
+    c.options.scales.y.grid.color = isDark() ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)';
+    c.options.scales.x.ticks.color = isDark() ? '#5a5850' : '#9a9288';
+    c.options.scales.y.ticks.color = isDark() ? '#5a5850' : '#9a9288';
+    c.options.plugins.tooltip.backgroundColor = isDark() ? '#1e2230' : '#ffffff';
+    c.options.plugins.tooltip.borderColor = isDark() ? '#2a2d3a' : '#e0dbd2';
+    c.options.plugins.tooltip.titleColor = isDark() ? '#e8e6e1' : '#1a1814';
+    c.options.plugins.tooltip.bodyColor = isDark() ? '#9a9890' : '#5a5248';
+    c.update('none');
+  });
+}
+
+// Persist theme
+const saved = localStorage.getItem('theme-forecast');
+if (saved) {
+  document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('themeBtn').textContent = saved === 'dark' ? 'Light' : 'Dark';
+}
+const origToggle = toggleTheme;
+window.toggleTheme = function() {
+  origToggle();
+  localStorage.setItem('theme-forecast', document.documentElement.getAttribute('data-theme'));
+};
+</script>
+</body>
+</html>
