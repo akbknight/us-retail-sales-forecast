@@ -1,0 +1,26 @@
+data:
+  series_id: RSXFS
+  series_name: "Advance Retail Sales: Retail Trade and Food Services"
+  units: "Millions of Dollars, Seasonally Adjusted"
+  source: "U.S. Census Bureau via FRED"
+  source_url: "https://fred.stlouisfed.org/series/RSXFS"
+  start: "2000-01-01"
+  frequency: MS  # Month Start
+
+forecast:
+  horizon_months: 18
+  model: "ETS(A,A,A)"
+  trend: add
+  seasonal: add
+  seasonal_periods: 12
+  initialization: estimated
+  ci_levels:
+    - 0.80
+    - 0.95
+
+backtesting:
+  holdout_months: 12
+
+output:
+  path: "forecast_data.json"
+  precision_billions: 2  # decimal places for billion-dollar outputs

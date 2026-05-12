@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "us-retail-sales-forecast"
+version = "1.0.0"
+description = "18-month US retail demand forecast using Holt-Winters ETS on FRED retail sales data"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Akshay Kumar", email = "ak8335a@american.edu" }]
+keywords = ["forecasting", "time-series", "retail", "economics", "ETS", "Holt-Winters"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "statsmodels>=0.14",
+    "scipy>=1.11",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pytest-cov>=4.0", "ruff>=0.1"]
+
+[project.scripts]
+retail-forecast = "src.cli.run:main"
+
+[project.urls]
+Homepage = "https://akbknight.github.io/us-retail-sales-forecast/"
+Repository = "https://github.com/akbknight/us-retail-sales-forecast"
+Documentation = "https://github.com/akbknight/us-retail-sales-forecast/tree/main/docs"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
