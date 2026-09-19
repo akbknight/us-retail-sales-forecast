@@ -1,10 +1,20 @@
-# US Retail Sales Demand Forecast
+# US Retail Sales Demand Forecast Engine
 
-**Flagship project. Production-grade time-series forecasting package.**
+> [!IMPORTANT]
+> **Flagship Econometric Forecasting Engine · Part of the Akshay Kumar Technical Portfolio Ecosystem**  
+> 🌐 **Executive Portfolio:** [https://akbknight.github.io/](https://akbknight.github.io/) · 💼 **LinkedIn:** [linkedin.com/in/akshaykumardl](https://www.linkedin.com/in/akshaykumardl/) · 📄 **Curriculum Vitae:** [Download PDF (369 KB)](https://akbknight.github.io/assets/Akshay_Resume.pdf)
 
-18-month probabilistic forecast for US Retail Sales (RSXFS) using a Holt-Winters ETS(A,A,A) state-space model on FRED data, with walk-forward backtesting, residual diagnostics, and an interactive live dashboard.
+[![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-GitHub%20Pages-0284c7?style=flat-square&logo=github)](https://akbknight.github.io/us-retail-sales-forecast/)
+[![Model Spec](https://img.shields.io/badge/Model-ETS(A%2CA%2CA)%20State--Space-10b981?style=flat-square)](https://www.statsmodels.org/)
+[![Data Source](https://img.shields.io/badge/Data%20Source-Federal%20Reserve%20(FRED)-blue?style=flat-square)](https://fred.stlouisfed.org/series/RSXFS)
+[![Horizon](https://img.shields.io/badge/Horizon-18%20Months%20Forward-8b5cf6?style=flat-square)](https://akbknight.github.io/us-retail-sales-forecast/)
+[![Backtest Accuracy](https://img.shields.io/badge/Backtest%20MAPE-~2.0%25-f59e0b?style=flat-square)](https://akbknight.github.io/us-retail-sales-forecast/)
+[![Author](https://img.shields.io/badge/Author-Akshay%20Kumar-09090b?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/akshaykumardl/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-gray?style=flat-square)](LICENSE)
 
-**Live dashboard:** https://akbknight.github.io/us-retail-sales-forecast/
+An 18-month forward predictive demand modeling engine for **U.S. Retail & Food Services Sales (RSXFS)** using Holt-Winters triple exponential smoothing in state-space form on Federal Reserve (FRED) time-series data. Features 80% and 95% predictive confidence intervals, walk-forward out-of-sample backtesting, Ljung-Box residual diagnostics, and an interactive client-side dashboard.
+
+👉 **Launch Live Dashboard:** **[https://akbknight.github.io/us-retail-sales-forecast/](https://akbknight.github.io/us-retail-sales-forecast/)**
 
 ---
 
@@ -148,7 +158,12 @@ Note: This project uses RSXFS (includes food services, the broader headline seri
 
 ---
 
-## Author
+## 👤 Author & Strategic Portfolio
 
-**Akshay Kumar**
-[linkedin.com/in/akshaykumardl](https://www.linkedin.com/in/akshaykumardl/)
+**Akshay Kumar**  
+STEM MBA Candidate · Business Analytics & AI · American University Kogod School of Business  
+Former Computer Programmer · U.S. Department of State  
+- **Executive Portfolio:** [https://akbknight.github.io/](https://akbknight.github.io/)  
+- **LinkedIn Profile:** [linkedin.com/in/akshaykumardl](https://www.linkedin.com/in/akshaykumardl/)  
+- **Direct Résumé:** [Download PDF (369 KB)](https://akbknight.github.io/assets/Akshay_Resume.pdf)  
+- **Email:** [ak8335a@american.edu](mailto:ak8335a@american.edu)
