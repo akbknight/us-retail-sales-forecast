@@ -33,13 +33,13 @@ RSXFS is the broadest monthly retail indicator — it covers all retail trade pl
 
 | Metric | Value |
 |---|---|
-| Latest actual (Mar 2026) | $752.1B |
-| 12-month forecast (Mar 2027) | $789.2B |
-| Projected change | +4.9% |
-| 95% confidence interval at 12m | $705B - $873B |
-| In-sample RMSE | $12.4B (1.65% of mean) |
-| Model AIC | 2,577 |
-| 12-month backtest MAPE | ~2.0% |
+| Latest actual (Aug 2026) | $646.3B |
+| 12-month forecast (Aug 2027) | $662.3B |
+| Projected change | +2.5% |
+| 95% confidence interval at 12m | $612.6B – $712.1B |
+| In-sample RMSE | $7.3B (1.13% of mean) |
+| Model AIC | 5,728 |
+| 12-month backtest MAPE | ~2.0% (1.23% holdout) |
 
 ---
 
@@ -65,9 +65,9 @@ Walk-forward backtest: the model is trained on all data except the final 12 mont
 | Backtest metric | Value |
 |---|---|
 | Holdout period | 12 months |
-| MAPE | ~2.0% |
-| MAE | ~$13-15B |
-| RMSE | ~$15-18B |
+| MAPE | ~2.0% (1.23% holdout) |
+| MAE | $7.8B |
+| RMSE | $9.9B |
 
 A ~2% MAPE is consistent with published ETS benchmarks on monthly macroeconomic series from the M4 Competition (Makridakis et al., 2020), where ETS ranked in the upper quartile of 61 methods on monthly economic series.
 
@@ -162,7 +162,7 @@ Note: This project uses RSXFS (includes food services, the broader headline seri
 
 **Akshay Kumar**  
 STEM MBA Candidate · Business Analytics & AI · American University Kogod School of Business  
-Former Computer Programmer · U.S. Department of State  
+Business Analyst, U.S. Embassy, India  
 - **Executive Portfolio:** [https://akbknight.github.io/](https://akbknight.github.io/)  
 - **LinkedIn Profile:** [linkedin.com/in/akshaykumardl](https://www.linkedin.com/in/akshaykumardl/)  
 - **Direct Résumé:** [Download PDF (369 KB)](https://akbknight.github.io/assets/Akshay_Resume.pdf)  

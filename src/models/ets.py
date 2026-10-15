@@ -77,7 +77,11 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
-from statsmodels.tsa.holtwinters import ExponentialSmoothing, HoltWintersResultsWrapper
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+try:
+    from statsmodels.tsa.holtwinters import HoltWintersResultsWrapper
+except ImportError:
+    from statsmodels.tsa.holtwinters.results import HoltWintersResultsWrapper
 
 
 def fit_ets(

@@ -93,14 +93,16 @@ def run_backtest(
     mae = compute_mae(actuals, predictions)
     rmse = compute_rmse(actuals, predictions)
 
+    actuals_rounded = [round(float(v), 2) for v in actuals]
+    predictions_rounded = [round(float(v), 2) for v in predictions]
     return {
         "train_dates": [d.strftime("%Y-%m-%d") for d in train.index],
         "test_dates": [d.strftime("%Y-%m-%d") for d in test.index],
-        "actuals": [round(float(v), 2) for v in actuals],
-        "predictions": [round(float(v), 2) for v in predictions],
+        "actuals": actuals_rounded,
+        "predictions": predictions_rounded,
         "ci95_upper": [round(v, 2) for v in ci95_upper],
         "ci95_lower": [round(v, 2) for v in ci95_lower],
-        "residuals": [round(float(v), 2) for v in residuals],
+        "residuals": [round(a - p, 2) for a, p in zip(actuals_rounded, predictions_rounded)],
         "metrics": {
             "mape": round(mape, 4),
             "mae": round(mae, 2),
