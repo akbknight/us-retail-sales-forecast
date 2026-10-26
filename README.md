@@ -167,3 +167,26 @@ Business Analyst, U.S. Embassy, India
 - **LinkedIn Profile:** [linkedin.com/in/akshaykumardl](https://www.linkedin.com/in/akshaykumardl/)  
 - **Direct Résumé:** [Download PDF (369 KB)](https://akbknight.github.io/assets/Akshay_Resume.pdf)  
 - **Email:** [ak8335a@american.edu](mailto:ak8335a@american.edu)
+
+
+---
+
+## 🔬 Econometric Benchmark & Baseline Evaluation
+
+We benchmarked **eight forecasting methods** across pre-holdout validation and a fixed-origin 12-month holdout (September 2025 – August 2026):
+
+| Model Specification | Validation MAE | Validation MAPE | Holdout Test MAE | Holdout Test MAPE | Test RMSE |
+|:---|---:|---:|---:|---:|---:|
+| **Simple Drift (Baseline)** | $7.677B | 1.27% | **$7.974B** | **1.250%** | $10.571B |
+| **Nonseasonal Holt** | **$7.318B** | **1.21%** | **$8.017B** | **1.256%** | $10.650B |
+| **Damped Nonseasonal Holt** | $8.014B | 1.32% | $8.386B | 1.314% | $11.195B |
+| **Additive Seasonal ETS** | $8.406B | 1.39% | $8.715B | 1.367% | $11.137B |
+| **Damped Seasonal ETS** | $9.284B | 1.53% | $9.235B | 1.449% | $11.803B |
+| **Last Value (Random Walk)** | $15.380B | 2.54% | $14.700B | 2.305% | $18.977B |
+| **Seasonal Naive** | $18.347B | 3.03% | $23.640B | 3.739% | $25.475B |
+| **Linear Trend (Full History)** | $57.051B | 9.43% | $58.262B | 9.254% | $58.851B |
+
+### Analytical Takeaways:
+1. **Saved Artifact Verification:** Recomputation of saved `forecast_data.json` matches **1.2294% MAPE** ($7.830B MAE).
+2. **Competitive Simplicity:** Simple Drift and Nonseasonal Holt were competitive with Seasonal ETS because the underlying FRED series (`RSXFS`) is already seasonally adjusted by the U.S. Census Bureau.
+3. **Reproducibility:** Run `py -3.12 scripts/forecast_compare.py` or inspect [`reports/baseline_benchmarks.md`](reports/baseline_benchmarks.md).
