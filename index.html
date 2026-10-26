@@ -113,7 +113,7 @@ a:hover { text-decoration: underline; }
 [data-theme="light"] .theme-icon-moon { display: inline-block; }
 
 /* --- Layout --- */
-header { border-bottom: 1px solid var(--border); padding: 18px 0; position: sticky; top: 0; background: var(--bg); z-index: 100; backdrop-filter: blur(8px); }
+header { border-bottom: 1px solid var(--border); padding: 18px 0; background: var(--bg); }
 .header-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
 .logo { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; color: var(--accent); letter-spacing: 0.05em; }
 .header-meta { display: flex; align-items: center; gap: 16px; }
@@ -449,11 +449,8 @@ function getVar(v) { return getComputedStyle(document.documentElement).getProper
 
 // ── Theme toggle ─────────────────────────────────────────────────────────────
 function toggleTheme() {
-  const html = document.documentElement;
-  const current = html.getAttribute('data-theme');
-  html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-  document.getElementById('themeBtn').textContent = current === 'dark' ? 'Dark' : 'Light';
-  updateChartThemes();
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
 }
 
 // ── Chart defaults ───────────────────────────────────────────────────────────
@@ -690,15 +687,21 @@ const fitChart = new Chart(document.getElementById('fitChart'), {
 // ── Update chart colors on theme change ──────────────────────────────────────
 function updateChartThemes() {
   [mainChart, yoyChart, fitChart].forEach(c => {
-    c.options.scales.x.grid.color = isDark() ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)';
-    c.options.scales.y.grid.color = isDark() ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)';
-    c.options.scales.x.ticks.color = isDark() ? '#5a5850' : '#9a9288';
-    c.options.scales.y.ticks.color = isDark() ? '#5a5850' : '#9a9288';
-    c.options.plugins.tooltip.backgroundColor = isDark() ? '#1e2230' : '#ffffff';
-    c.options.plugins.tooltip.borderColor = isDark() ? '#2a2d3a' : '#e0dbd2';
-    c.options.plugins.tooltip.titleColor = isDark() ? '#e8e6e1' : '#1a1814';
-    c.options.plugins.tooltip.bodyColor = isDark() ? '#9a9890' : '#5a5248';
-    c.update('none');
+    if (!c || !c.options) return;
+    if (c.options.scales?.x?.grid) c.options.scales.x.grid.color = isDark() ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)';
+    if (c.options.scales?.y?.grid) c.options.scales.y.grid.color = isDark() ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)';
+    if (c.options.scales?.x?.ticks) c.options.scales.x.ticks.color = isDark() ? '#5a5850' : '#9a9288';
+    if (c.options.scales?.y?.ticks) c.options.scales.y.ticks.color = isDark() ? '#5a5850' : '#9a9288';
+    if (c.options.plugins?.tooltip) {
+      c.options.plugins.tooltip.backgroundColor = isDark() ? '#1e2230' : '#ffffff';
+      c.options.plugins.tooltip.borderColor = isDark() ? '#2a2d3a' : '#e0dbd2';
+      c.options.plugins.tooltip.titleColor = isDark() ? '#e8e6e1' : '#1a1814';
+      c.options.plugins.tooltip.bodyColor = isDark() ? '#9a9890' : '#5a5248';
+    }
+    if (c.options.plugins?.annotation?.annotations?.zeroLine) {
+      c.options.plugins.annotation.annotations.zeroLine.borderColor = isDark() ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)';
+    }
+    c.update();
   });
 }
 
