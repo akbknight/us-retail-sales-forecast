@@ -171,9 +171,13 @@ Business Analyst, U.S. Embassy, India
 
 ---
 
-## 🔬 Econometric Benchmark & Baseline Evaluation
+## 🔬 Econometric Benchmark & Baseline Evaluation (5-Element Case Study)
 
-We benchmarked **eight forecasting methods** across pre-holdout validation and a fixed-origin 12-month holdout (September 2025 – August 2026):
+- **Question:** Does a complex seasonal state-space exponential smoothing architecture (`ETS(A,A,A)`) consistently outperform simpler econometric baselines on monthly retail sales demand?
+- **Evidence:** Evaluated FRED monthly US Advance Retail Sales series (`RSXFS`, 1992–2026, 320 monthly observations, seasonally adjusted). Chronologically evaluated 8 candidate forecasting methods across a 12-month pre-holdout validation window (September 2024 – August 2025) and a locked 12-month out-of-sample holdout (September 2025 – August 2026).
+- **Result:** On the pre-holdout validation window, **Nonseasonal Holt** achieved the lowest error ($7.318B MAE, 1.21% MAPE), followed closely by a **Simple Drift Baseline** ($7.677B MAE, 1.27% MAPE). On the locked 12-month holdout (Sep 2025–Aug 2026), **Simple Drift** achieved **1.250% MAPE** ($7.974B MAE) and **Nonseasonal Holt** achieved **1.256% MAPE** ($8.017B MAE), outperforming Additive Seasonal ETS (1.367% MAPE, $8.715B MAE) and Seasonal Naive (3.739% MAPE, $23.640B MAE). Recomputation of the saved pipeline output (`forecast_data.json`) reproduced the stored **1.2294% MAPE** ($7.830B MAE) calculation on this 12-month fixed-origin window.
+- **Recommendation:** Do not claim 24-month rolling superiority without evaluating multiple forecast origins. Adopt parsimonious nonseasonal baselines (Simple Drift or Nonseasonal Holt) as the primary evaluation standard for seasonally adjusted retail series before justifying complex multi-parameter models.
+- **Limitation:** The benchmark is evaluated on a single fixed-origin 12-month holdout and does not model rolling walk-forward origins, sudden macroeconomic regime shifts, or supply chain shocks.
 
 | Model Specification | Validation MAE | Validation MAPE | Holdout Test MAE | Holdout Test MAPE | Test RMSE |
 |:---|---:|---:|---:|---:|---:|
@@ -186,7 +190,6 @@ We benchmarked **eight forecasting methods** across pre-holdout validation and a
 | **Seasonal Naive** | $18.347B | 3.03% | $23.640B | 3.739% | $25.475B |
 | **Linear Trend (Full History)** | $57.051B | 9.43% | $58.262B | 9.254% | $58.851B |
 
-### Analytical Takeaways:
-1. **Saved Artifact Verification:** Recomputation of saved `forecast_data.json` matches **1.2294% MAPE** ($7.830B MAE).
-2. **Competitive Simplicity:** Simple Drift and Nonseasonal Holt were competitive with Seasonal ETS because the underlying FRED series (`RSXFS`) is already seasonally adjusted by the U.S. Census Bureau.
-3. **Reproducibility:** Run `py -3.12 scripts/forecast_compare.py` or inspect [`reports/baseline_benchmarks.md`](reports/baseline_benchmarks.md).
+### Reproducibility & Source Verification:
+- **Reproduce Locally:** Run `py -3.12 scripts/forecast_compare.py` to recompute all validation rankings and holdout scores directly.
+- **Full Report:** See [`reports/baseline_benchmarks.md`](reports/baseline_benchmarks.md).

@@ -8,24 +8,15 @@
 
 ---
 
-## 1. Executive Summary & Evaluation Context
+## 1. Executive Summary & Structured Case Study
 
-Does a complex state-space exponential smoothing model with seasonality (`ETS(A,A,A)`) consistently outperform simpler econometric baselines on forward retail demand?
+### Core Analytical Case Study (Question → Evidence → Result → Recommendation → Limitation)
 
-To establish empirical rigor, we benchmarked **eight forecasting methods** across a pre-holdout validation window (September 2024 – August 2025) and a locked 12-month out-of-sample holdout (September 2025 – August 2026).
-
-### Key Empirical Findings
-1. **Validation Selection:** On the 12-month pre-holdout validation window, **Nonseasonal Holt** achieved the lowest error ($7.318B MAE, 1.21% MAPE), followed closely by a **Simple Drift Baseline** ($7.677B MAE, 1.27% MAPE).
-2. **Holdout Test Accuracy:** On the held-out 12 months:
-   - **Simple Drift:** $7.974B MAE (1.250% MAPE)
-   - **Nonseasonal Holt:** $8.017B MAE (1.256% MAPE)
-   - **Damped Nonseasonal Holt:** $8.386B MAE (1.314% MAPE)
-   - **Additive Seasonal ETS:** $8.715B MAE (1.367% MAPE)
-   - **Damped Seasonal ETS:** $9.235B MAE (1.449% MAPE)
-   - **Last Observed Value:** $14.700B MAE (2.305% MAPE)
-   - **Seasonal Naive:** $23.640B MAE (3.739% MAPE)
-3. **Saved Output Verification:** Recomputation of the saved `forecast_data.json` artifacts reproduces **1.2294% MAPE**, **$7.830B MAE**, and **$9.928B RMSE**.
-4. **Methodological Clarification:** The evaluation is a **fixed-origin 12-month holdout**, not rolling walk-forward retraining. Furthermore, because the source series is already seasonally adjusted by the U.S. Census Bureau, nonseasonal models (Holt and Drift) perform as well or better than seasonal variants without unnecessary parameter overhead.
+- **Question:** Does a complex seasonal state-space exponential smoothing architecture (`ETS(A,A,A)`) consistently outperform simpler econometric baselines on forward retail demand?
+- **Evidence:** Evaluated the Federal Reserve Economic Data (FRED) monthly US Advance Retail Sales series (`RSXFS`, 1992–2026, 320 monthly observations, seasonally adjusted). Chronologically evaluated 8 candidate forecasting methods across a 12-month pre-holdout validation window (September 2024 – August 2025) and a locked 12-month out-of-sample holdout (September 2025 – August 2026).
+- **Result:** On the pre-holdout validation window, **Nonseasonal Holt** achieved the lowest error ($7.318B MAE, 1.21% MAPE), followed closely by a **Simple Drift Baseline** ($7.677B MAE, 1.27% MAPE). On the locked 12-month holdout (Sep 2025–Aug 2026), **Simple Drift** achieved **1.250% MAPE** ($7.974B MAE) and **Nonseasonal Holt** achieved **1.256% MAPE** ($8.017B MAE), outperforming Additive Seasonal ETS (1.367% MAPE, $8.715B MAE) and Seasonal Naive (3.739% MAPE, $23.640B MAE). Recomputation of the saved pipeline output (`forecast_data.json`) reproduced the stored **1.2294% MAPE** ($7.830B MAE) calculation on this 12-month fixed-origin window.
+- **Recommendation:** Do not claim 24-month rolling superiority without evaluating multiple forecast origins. Adopt parsimonious nonseasonal baselines (Simple Drift or Nonseasonal Holt) as the primary evaluation standard for seasonally adjusted retail series before justifying complex multi-parameter models.
+- **Limitation:** The benchmark is evaluated on a single fixed-origin 12-month holdout and does not model rolling walk-forward origins, sudden macroeconomic regime shifts, or supply chain shocks.
 
 ---
 
