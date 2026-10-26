@@ -98,6 +98,9 @@ def run_benchmark():
     print("-" * 70)
 
     test_res = [{"model": n, **metrics(actual, predict(n, train, len(actual)))} for n in models]
+    test_lookup = {r["model"]: r for r in test_res}
+    val_lookup = {r["model"]: r for r in val_res}
+
     for r in sorted(test_res, key=lambda x: x["MAE_billions"]):
         print(f"{r['model']:<26} | ${r['MAE_billions']:>12.3f}B | ${r['RMSE_billions']:>10.3f}B | {r['MAPE_pct']:>8.3f}%")
 
@@ -105,10 +108,139 @@ def run_benchmark():
     print("\n3. Saved Deployed Model Check (ETS Additive):")
     print(f"  Saved Recomputed Test MAE: ${stored['MAE_billions']:.3f}B | Test MAPE: {stored['MAPE_pct']:.4f}%")
 
-    print("\nAnalytical Takeaway:")
-    print("  Simple Drift ($7.974B MAE, 1.250% MAPE) and Nonseasonal Holt ($8.017B MAE, 1.256% MAPE)")
-    print("  were highly competitive with seasonal ETS ($8.715B MAE, 1.367% MAPE) because the source")
-    print("  FRED series (RSXFS) is already seasonally adjusted. Complexity must be defended empirically.")
+    drift_m = test_lookup["Drift"]
+    holt_m = test_lookup["Holt nonseasonal"]
+    ets_m = test_lookup["ETS additive seasonal"]
+
+    print("\nAnalytical Takeaway (Calculated from Current Run):")
+    print(f"  Simple Drift (${drift_m['MAE_billions']:.3f}B MAE, {drift_m['MAPE_pct']:.3f}% MAPE) and Nonseasonal Holt (${holt_m['MAE_billions']:.3f}B MAE, {holt_m['MAPE_pct']:.3f}% MAPE)")
+    print(f"  were highly competitive with Seasonal ETS (${ets_m['MAE_billions']:.3f}B MAE, {ets_m['MAPE_pct']:.3f}% MAPE).")
+    print("  One possible explanation is that the source FRED series (RSXFS) is already seasonally adjusted prior to publication.")
+    print("  However, this is an empirical hypothesis rather than a proven causal finding; parameter estimation variance may also contribute.")
+
+    # Save structured results to reports/forecast_benchmark_results.json
+    reports_dir = Path(__file__).resolve().parent.parent / "reports"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    json_path = reports_dir / "forecast_benchmark_results.json"
+
+    structured_results = {
+        "dataset_summary": {
+            "historical_observations_months": len(train),
+            "validation_window": f"{str(dates[dates < test_dates.min()][-12])[:10]} to {str(dates[dates < test_dates.min()][-1])[:10]}",
+            "holdout_test_window": f"{str(test_dates.min())[:10]} to {str(test_dates.max())[:10]}",
+            "holdout_test_months": len(actual),
+        },
+        "validation_benchmark": val_res,
+        "validation_winner": winner,
+        "holdout_test_benchmark": test_res,
+        "stored_recomputed": stored,
+        "computed_takeaway": {
+            "drift_mae": drift_m["MAE_billions"],
+            "drift_mape": drift_m["MAPE_pct"],
+            "holt_mae": holt_m["MAE_billions"],
+            "holt_mape": holt_m["MAPE_pct"],
+            "ets_mae": ets_m["MAE_billions"],
+            "ets_mape": ets_m["MAPE_pct"],
+        }
+    }
+    json_path.write_text(json.dumps(structured_results, indent=2), encoding="utf-8")
+    print(f"\n[Saved] Structured run output written to: {json_path}")
+
+    # Synchronize report tables from structured output
+    report_md_path = reports_dir / "baseline_benchmarks.md"
+    sync_forecast_report(structured_results, report_md_path)
+    print(f"[Generated] Forecast benchmark report tables synchronized at: {report_md_path}")
+
+def sync_forecast_report(res, report_path):
+    v_lookup = {r["model"]: r for r in res["validation_benchmark"]}
+    t_lookup = {r["model"]: r for r in res["holdout_test_benchmark"]}
+    winner = res["validation_winner"]
+    c_take = res["computed_takeaway"]
+    stored = res["stored_recomputed"]
+
+    cat_map = {
+        "Drift": "Empirical Baseline",
+        "Holt nonseasonal": "State-Space Smoothing",
+        "Damped Holt nonseasonal": "State-Space Smoothing",
+        "ETS additive seasonal": "Full State-Space ETS",
+        "ETS damped seasonal": "Full State-Space ETS",
+        "Last value": "Naive Baseline",
+        "Seasonal naive": "Seasonal Baseline",
+        "Linear trend": "Global Trend"
+    }
+
+    display_names = {
+        "Drift": "Simple Drift",
+        "Holt nonseasonal": "Nonseasonal Holt",
+        "Damped Holt nonseasonal": "Damped Nonseasonal Holt",
+        "ETS additive seasonal": "Additive Seasonal ETS",
+        "ETS damped seasonal": "Damped Seasonal ETS",
+        "Last value": "Last Value (Random Walk)",
+        "Seasonal naive": "Seasonal Naive",
+        "Linear trend": "Linear Trend (Full History)"
+    }
+
+    order = sorted(t_lookup.values(), key=lambda x: x["MAE_billions"])
+    rows = []
+    for r in order:
+        m_raw = r["model"]
+        d_name = display_names.get(m_raw, m_raw)
+        cat = cat_map.get(m_raw, "Benchmark Model")
+        v = v_lookup.get(m_raw, {})
+        v_mae = f"${v.get('MAE_billions', 0):.3f}B"
+        v_mape = f"{v.get('MAPE_pct', 0):.2f}%"
+        t_mae = f"${r['MAE_billions']:.3f}B"
+        t_mape = f"{r['MAPE_pct']:.3f}%"
+        t_rmse = f"${r['RMSE_billions']:.3f}B"
+        if m_raw == "Drift":
+            rows.append(f"| **{d_name}** | {cat} | {v_mae} | {v_mape} | **{t_mae}** | **{t_mape}** | {t_rmse} |")
+        elif m_raw == "Holt nonseasonal":
+            rows.append(f"| **{d_name}** | {cat} | **{v_mae}** | **{v_mape}** | **{t_mae}** | **{t_mape}** | {t_rmse} |")
+        else:
+            rows.append(f"| **{d_name}** | {cat} | {v_mae} | {v_mape} | {t_mae} | {t_mape} | {t_rmse} |")
+
+    table_content = "\n".join(rows)
+
+    content = f"""# US Retail Demand Forecasting Benchmark & Baseline Comparison
+
+**Prepared:** October 2026  
+**Author:** Akshay Kumar  
+**Target Codebase:** `us-retail-sales-forecast`  
+**Evaluation Script:** `scripts/forecast_compare.py`  
+**Data Series:** FRED `RSXFS` (Advance Retail Sales: Retail Trade and Food Services, Seasonally Adjusted)  
+**Structured Output:** `reports/forecast_benchmark_results.json`
+
+---
+
+## 1. Executive Summary & Structured Case Study
+
+### Core Analytical Case Study (Question → Evidence → Result → Recommendation → Limitation)
+
+- **Question:** Does a complex seasonal state-space exponential smoothing architecture (`ETS(A,A,A)`) consistently outperform simpler econometric baselines on forward retail demand?
+- **Evidence:** Evaluated the Federal Reserve Economic Data (FRED) monthly US Advance Retail Sales series (`RSXFS`, 1992–2026, 320 monthly observations, seasonally adjusted). Chronologically evaluated 8 candidate forecasting methods across a 12-month pre-holdout validation window (September 2024 – August 2025) and a locked 12-month out-of-sample holdout (September 2025 – August 2026).
+- **Result:** On the pre-holdout validation window, **Nonseasonal Holt** achieved the lowest error (${v_lookup['Holt nonseasonal']['MAE_billions']:.3f}B MAE, {v_lookup['Holt nonseasonal']['MAPE_pct']:.2f}% MAPE), followed closely by a **Simple Drift Baseline** (${v_lookup['Drift']['MAE_billions']:.3f}B MAE, {v_lookup['Drift']['MAPE_pct']:.2f}% MAPE). On the locked 12-month holdout (Sep 2025–Aug 2026), **Simple Drift** achieved **{c_take['drift_mape']:.3f}% MAPE** (${c_take['drift_mae']:.3f}B MAE) and **Nonseasonal Holt** achieved **{c_take['holt_mape']:.3f}% MAPE** (${c_take['holt_mae']:.3f}B MAE), outperforming Additive Seasonal ETS ({c_take['ets_mape']:.3f}% MAPE, ${c_take['ets_mae']:.3f}B MAE) and Seasonal Naive ({t_lookup['Seasonal naive']['MAPE_pct']:.3f}% MAPE, ${t_lookup['Seasonal naive']['MAE_billions']:.3f}B MAE). Recomputation of the saved pipeline output (`forecast_data.json`) reproduced the stored **{stored['MAPE_pct']:.4f}% MAPE** (${stored['MAE_billions']:.3f}B MAE) calculation on this 12-month fixed-origin window.
+- **Recommendation:** Do not claim 24-month rolling superiority without evaluating multiple forecast origins. Adopt parsimonious nonseasonal baselines (Simple Drift or Nonseasonal Holt) as the primary evaluation standard for seasonally adjusted retail series before justifying complex multi-parameter models.
+- **Limitation:** The benchmark is evaluated on a single fixed-origin 12-month holdout and does not model rolling walk-forward origins, sudden macroeconomic regime shifts, or supply chain shocks. One possible explanation for why nonseasonal baselines were competitive is that `RSXFS` is already seasonally adjusted prior to publication; however, this is an empirical hypothesis rather than a proven causal finding.
+
+---
+
+## 2. 8-Model Comparative Benchmark Table
+
+| Model Specification | Model Category | Validation MAE | Validation MAPE | Holdout Test MAE | Holdout Test MAPE | Out-of-Sample RMSE |
+|:---|:---|---:|---:|---:|---:|---:|
+{table_content}
+
+---
+
+## 3. Operational & Reproducibility Guide
+
+To reproduce this benchmark directly:
+```bash
+py -3.12 scripts/forecast_compare.py
+```
+Outputs print validation rankings, holdout test metrics, and verify saved predictions against actuals. All tables in this report are generated directly from `reports/forecast_benchmark_results.json`.
+"""
+    report_path.write_text(content, encoding="utf-8")
 
 if __name__ == "__main__":
     run_benchmark()

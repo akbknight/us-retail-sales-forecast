@@ -4,7 +4,8 @@
 **Author:** Akshay Kumar  
 **Target Codebase:** `us-retail-sales-forecast`  
 **Evaluation Script:** `scripts/forecast_compare.py`  
-**Data Series:** FRED `RSXFS` (Advance Retail Sales: Retail Trade and Food Services, Seasonally Adjusted)
+**Data Series:** FRED `RSXFS` (Advance Retail Sales: Retail Trade and Food Services, Seasonally Adjusted)  
+**Structured Output:** `reports/forecast_benchmark_results.json`
 
 ---
 
@@ -16,7 +17,7 @@
 - **Evidence:** Evaluated the Federal Reserve Economic Data (FRED) monthly US Advance Retail Sales series (`RSXFS`, 1992–2026, 320 monthly observations, seasonally adjusted). Chronologically evaluated 8 candidate forecasting methods across a 12-month pre-holdout validation window (September 2024 – August 2025) and a locked 12-month out-of-sample holdout (September 2025 – August 2026).
 - **Result:** On the pre-holdout validation window, **Nonseasonal Holt** achieved the lowest error ($7.318B MAE, 1.21% MAPE), followed closely by a **Simple Drift Baseline** ($7.677B MAE, 1.27% MAPE). On the locked 12-month holdout (Sep 2025–Aug 2026), **Simple Drift** achieved **1.250% MAPE** ($7.974B MAE) and **Nonseasonal Holt** achieved **1.256% MAPE** ($8.017B MAE), outperforming Additive Seasonal ETS (1.367% MAPE, $8.715B MAE) and Seasonal Naive (3.739% MAPE, $23.640B MAE). Recomputation of the saved pipeline output (`forecast_data.json`) reproduced the stored **1.2294% MAPE** ($7.830B MAE) calculation on this 12-month fixed-origin window.
 - **Recommendation:** Do not claim 24-month rolling superiority without evaluating multiple forecast origins. Adopt parsimonious nonseasonal baselines (Simple Drift or Nonseasonal Holt) as the primary evaluation standard for seasonally adjusted retail series before justifying complex multi-parameter models.
-- **Limitation:** The benchmark is evaluated on a single fixed-origin 12-month holdout and does not model rolling walk-forward origins, sudden macroeconomic regime shifts, or supply chain shocks.
+- **Limitation:** The benchmark is evaluated on a single fixed-origin 12-month holdout and does not model rolling walk-forward origins, sudden macroeconomic regime shifts, or supply chain shocks. One possible explanation for why nonseasonal baselines were competitive is that `RSXFS` is already seasonally adjusted prior to publication; however, this is an empirical hypothesis rather than a proven causal finding.
 
 ---
 
@@ -41,4 +42,4 @@ To reproduce this benchmark directly:
 ```bash
 py -3.12 scripts/forecast_compare.py
 ```
-Outputs print validation rankings, holdout test metrics, and verify saved predictions against actuals.
+Outputs print validation rankings, holdout test metrics, and verify saved predictions against actuals. All tables in this report are generated directly from `reports/forecast_benchmark_results.json`.

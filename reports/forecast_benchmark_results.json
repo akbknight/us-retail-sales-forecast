@@ -1,0 +1,122 @@
+{
+  "dataset_summary": {
+    "historical_observations_months": 308,
+    "validation_window": "2024-09-01 to 2025-08-01",
+    "holdout_test_window": "2025-09-01 to 2026-08-01",
+    "holdout_test_months": 12
+  },
+  "validation_benchmark": [
+    {
+      "model": "Last value",
+      "MAE_billions": 15.380000000000015,
+      "RMSE_billions": 16.427589090713646,
+      "MAPE_pct": 2.5352641794830197
+    },
+    {
+      "model": "Seasonal naive",
+      "MAE_billions": 18.346666666666675,
+      "RMSE_billions": 19.519723358695444,
+      "MAPE_pct": 3.026061507699538
+    },
+    {
+      "model": "Drift",
+      "MAE_billions": 7.677344632768363,
+      "RMSE_billions": 8.580118961375929,
+      "MAPE_pct": 1.2658101867643585
+    },
+    {
+      "model": "Linear trend",
+      "MAE_billions": 57.05134526899777,
+      "RMSE_billions": 57.186672610552485,
+      "MAPE_pct": 9.433715937300152
+    },
+    {
+      "model": "ETS additive seasonal",
+      "MAE_billions": 8.405853198471695,
+      "RMSE_billions": 9.526536998196132,
+      "MAPE_pct": 1.3862271491593139
+    },
+    {
+      "model": "ETS damped seasonal",
+      "MAE_billions": 9.284272874686025,
+      "RMSE_billions": 10.30463530763238,
+      "MAPE_pct": 1.530961513035267
+    },
+    {
+      "model": "Holt nonseasonal",
+      "MAE_billions": 7.317969978841944,
+      "RMSE_billions": 8.198720449633388,
+      "MAPE_pct": 1.2064544825393342
+    },
+    {
+      "model": "Damped Holt nonseasonal",
+      "MAE_billions": 8.013769797631406,
+      "RMSE_billions": 8.938041911779738,
+      "MAPE_pct": 1.3208693139768075
+    }
+  ],
+  "validation_winner": "Holt nonseasonal",
+  "holdout_test_benchmark": [
+    {
+      "model": "Last value",
+      "MAE_billions": 14.699666666666625,
+      "RMSE_billions": 18.976788659658204,
+      "MAPE_pct": 2.304559090837836
+    },
+    {
+      "model": "Seasonal naive",
+      "MAE_billions": 23.63966666666666,
+      "RMSE_billions": 25.4746347929334,
+      "MAPE_pct": 3.739355371639889
+    },
+    {
+      "model": "Drift",
+      "MAE_billions": 7.973770358306183,
+      "RMSE_billions": 10.570562846729175,
+      "MAPE_pct": 1.2496828695331763
+    },
+    {
+      "model": "Linear trend",
+      "MAE_billions": 58.26226253116071,
+      "RMSE_billions": 58.85123822898855,
+      "MAPE_pct": 9.253592872803816
+    },
+    {
+      "model": "ETS additive seasonal",
+      "MAE_billions": 8.715137139424343,
+      "RMSE_billions": 11.13678191487931,
+      "MAPE_pct": 1.3674319309091325
+    },
+    {
+      "model": "ETS damped seasonal",
+      "MAE_billions": 9.234748423173443,
+      "RMSE_billions": 11.80301703371747,
+      "MAPE_pct": 1.4487841660733727
+    },
+    {
+      "model": "Holt nonseasonal",
+      "MAE_billions": 8.016500674013173,
+      "RMSE_billions": 10.650390920883298,
+      "MAPE_pct": 1.2562360039104123
+    },
+    {
+      "model": "Damped Holt nonseasonal",
+      "MAE_billions": 8.38595903090272,
+      "RMSE_billions": 11.194965090866136,
+      "MAPE_pct": 1.3137555260291456
+    }
+  ],
+  "stored_recomputed": {
+    "MAE_billions": 7.829857500000003,
+    "RMSE_billions": 9.928070024479847,
+    "MAPE_pct": 1.2294294908786882
+  },
+  "computed_takeaway": {
+    "drift_mae": 7.973770358306183,
+    "drift_mape": 1.2496828695331763,
+    "holt_mae": 8.016500674013173,
+    "holt_mape": 1.2562360039104123,
+    "ets_mae": 8.715137139424343,
+    "ets_mape": 1.3674319309091325
+  }
+}
