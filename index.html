@@ -442,62 +442,107 @@ footer { border-top: 1px solid var(--border); padding: 32px 24px; margin-top: 48
   </div>
 
   
-  <!-- Econometric Model Benchmark Scoreboard -->
+    <!-- Econometric Model Benchmark Scoreboard -->
   <div class="chart-section" style="margin-top: 32px;">
     <div class="chart-header">
-      <p class="chart-title">Econometric Model Benchmark &amp; Walk-Forward Backtest Scoreboard</p>
-      <p class="chart-subtitle">12-month holdout evaluation across candidate forecasting models on 320 monthly RSXFS observations</p>
+      <p class="chart-title">Econometric Model Benchmark &amp; Fixed-Origin Holdout Evaluation</p>
+      <p class="chart-subtitle">Structured comparison from reports/forecast_benchmark_results.json across 8 candidate models evaluated on locked 12-month holdout (Sep 2025–Aug 2026)</p>
     </div>
     <div class="table-card">
       <div class="table-responsive">
         <table class="benchmark-table">
           <thead>
             <tr>
-              <th>Model Architecture</th>
-              <th>Specification</th>
-              <th style="text-align: right;">Holdout MAPE</th>
-              <th style="text-align: right;">Holdout MAE</th>
-              <th style="text-align: right;">In-Sample RMSE</th>
-              <th style="text-align: right;">AIC Score</th>
-              <th style="text-align: center;">Production Status</th>
+              <th>Model Specification</th>
+              <th>Model Category</th>
+              <th style="text-align: right;">Validation MAE</th>
+              <th style="text-align: right;">Validation MAPE</th>
+              <th style="text-align: right;">Holdout Test MAE</th>
+              <th style="text-align: right;">Holdout Test MAPE</th>
+              <th style="text-align: right;">Holdout RMSE</th>
+              <th style="text-align: center;">Evaluation Note</th>
             </tr>
           </thead>
           <tbody>
             <tr class="selected-model-row">
-              <td><strong>Holt-Winters Triple Exp. Smoothing</strong></td>
-              <td>Additive Trend + 12M Seasonality (L-BFGS-B, &alpha;=0.86, &beta;=0.05, &gamma;=0.30)</td>
-              <td style="text-align: right;" class="stat-highlight">1.23%</td>
-              <td style="text-align: right;">$8.1B</td>
-              <td style="text-align: right;">$7.3B</td>
-              <td style="text-align: right;">5,728</td>
-              <td style="text-align: center;"><span class="badge-active">Selected Baseline</span></td>
+              <td><strong>Simple Drift</strong></td>
+              <td>Empirical Baseline</td>
+              <td style="text-align: right;">$7.677B</td>
+              <td style="text-align: right;">1.27%</td>
+              <td style="text-align: right;" class="stat-highlight">$7.974B</td>
+              <td style="text-align: right;" class="stat-highlight">1.250%</td>
+              <td style="text-align: right;">$10.571B</td>
+              <td style="text-align: center;"><span class="badge-active">Top Holdout Performer</span></td>
             </tr>
             <tr>
-              <td><strong>Seasonal AutoARIMA</strong></td>
-              <td>SARIMAX(1, 1, 2) &times; (0, 1, 1)<sub>12</sub> with drift</td>
-              <td style="text-align: right;">2.45%</td>
-              <td style="text-align: right;">$14.8B</td>
-              <td style="text-align: right;">$9.1B</td>
-              <td style="text-align: right;">5,842</td>
-              <td style="text-align: center;"><span class="badge-alt">Candidate</span></td>
+              <td><strong>Nonseasonal Holt</strong></td>
+              <td>State-Space Smoothing</td>
+              <td style="text-align: right;">$7.318B</td>
+              <td style="text-align: right;">1.21%</td>
+              <td style="text-align: right;">$8.017B</td>
+              <td style="text-align: right;">1.256%</td>
+              <td style="text-align: right;">$10.650B</td>
+              <td style="text-align: center;"><span class="badge-alt">Lowest Validation Error</span></td>
             </tr>
             <tr>
-              <td><strong>Exponential Trend (Simple Drift)</strong></td>
-              <td>Log-linear deterministic trend extrapolation</td>
-              <td style="text-align: right;">3.82%</td>
-              <td style="text-align: right;">$23.4B</td>
-              <td style="text-align: right;">$14.2B</td>
-              <td style="text-align: right;">6,104</td>
-              <td style="text-align: center;"><span class="badge-alt">Benchmark</span></td>
+              <td><strong>Production Holt-Winters</strong></td>
+              <td>Additive Trend &amp; Seasonality</td>
+              <td style="text-align: right;">$7.830B</td>
+              <td style="text-align: right;">1.23%</td>
+              <td style="text-align: right;">$7.830B</td>
+              <td style="text-align: right;">1.229%</td>
+              <td style="text-align: right;">$9.640B</td>
+              <td style="text-align: center;"><span class="badge-alt">Stored Pipeline Output</span></td>
             </tr>
             <tr>
-              <td><strong>Seasonal Na&iuml;ve Baseline</strong></td>
-              <td>Lag-12 persistence rule: y&#770;<sub>t+h</sub> = y<sub>t+h-12</sub></td>
-              <td style="text-align: right;">4.15%</td>
-              <td style="text-align: right;">$26.1B</td>
-              <td style="text-align: right;">$16.8B</td>
-              <td style="text-align: right;">6,320</td>
+              <td><strong>Additive Seasonal ETS</strong></td>
+              <td>Full State-Space ETS</td>
+              <td style="text-align: right;">$8.406B</td>
+              <td style="text-align: right;">1.39%</td>
+              <td style="text-align: right;">$8.715B</td>
+              <td style="text-align: right;">1.367%</td>
+              <td style="text-align: right;">$11.137B</td>
+              <td style="text-align: center;"><span class="badge-alt">ETS(A,A,A)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Damped Seasonal ETS</strong></td>
+              <td>Full State-Space ETS</td>
+              <td style="text-align: right;">$9.284B</td>
+              <td style="text-align: right;">1.53%</td>
+              <td style="text-align: right;">$9.235B</td>
+              <td style="text-align: right;">1.449%</td>
+              <td style="text-align: right;">$11.803B</td>
+              <td style="text-align: center;"><span class="badge-alt">ETS(A,Ad,A)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Last Value (Random Walk)</strong></td>
+              <td>Naive Baseline</td>
+              <td style="text-align: right;">$15.380B</td>
+              <td style="text-align: right;">2.54%</td>
+              <td style="text-align: right;">$14.700B</td>
+              <td style="text-align: right;">2.305%</td>
+              <td style="text-align: right;">$18.977B</td>
               <td style="text-align: center;"><span class="badge-alt">Reference</span></td>
+            </tr>
+            <tr>
+              <td><strong>Seasonal Na&iuml;ve</strong></td>
+              <td>Seasonal Baseline</td>
+              <td style="text-align: right;">$18.347B</td>
+              <td style="text-align: right;">3.03%</td>
+              <td style="text-align: right;">$23.640B</td>
+              <td style="text-align: right;">3.739%</td>
+              <td style="text-align: right;">$25.475B</td>
+              <td style="text-align: center;"><span class="badge-alt">Lag-12 Persistence</span></td>
+            </tr>
+            <tr>
+              <td><strong>Linear Trend (Full History)</strong></td>
+              <td>Global Trend</td>
+              <td style="text-align: right;">$57.051B</td>
+              <td style="text-align: right;">9.43%</td>
+              <td style="text-align: right;">$58.262B</td>
+              <td style="text-align: right;">9.254%</td>
+              <td style="text-align: right;">$58.851B</td>
+              <td style="text-align: center;"><span class="badge-alt">OLS Baseline</span></td>
             </tr>
           </tbody>
         </table>
@@ -547,7 +592,7 @@ footer { border-top: 1px solid var(--border); padding: 32px 24px; margin-top: 48
       </div>
       <div class="method-item">
         <h4>03 · Empirical Evidence &amp; Backtest</h4>
-        <p>Evaluated on 320 monthly observations of FRED <code>RSXFS</code> (Jan 2000 – Aug 2026). Rigorous walk-forward holdout validation over a 12-month holdout achieves ~2.0% holdout backtest MAPE (1.23% point test) evaluated via MAE ($8.1B) and RMSE ($9.6B).</p>
+        <p>Evaluated on 320 monthly observations of FRED <code>RSXFS</code> (Jan 2000 – Aug 2026). Evaluated on a locked 12-month fixed-origin holdout window (Sep 2025 – Aug 2026). The stored production pipeline achieves 1.2294% MAPE ($7.830B MAE, $9.64B RMSE), while parsimonious Simple Drift achieves 1.250% MAPE ($7.974B MAE) and Seasonal Naïve achieves 3.739% MAPE ($23.640B MAE), as documented in reports/baseline_benchmarks.md.</p>
       </div>
       <div class="method-item">
         <h4>04 · Analytical Results</h4>
