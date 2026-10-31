@@ -442,11 +442,11 @@ footer { border-top: 1px solid var(--border); padding: 32px 24px; margin-top: 48
   </div>
 
   
-    <!-- Econometric Model Benchmark Scoreboard -->
+      <!-- Econometric Model Benchmark & Evaluation Suite -->
   <div class="chart-section" style="margin-top: 32px;">
     <div class="chart-header">
-      <p class="chart-title">Econometric Model Benchmark &amp; Fixed-Origin Holdout Evaluation</p>
-      <p class="chart-subtitle">Structured comparison from reports/forecast_benchmark_results.json across 8 candidate models evaluated on locked 12-month holdout (Sep 2025–Aug 2026)</p>
+      <p class="chart-title">Econometric Model Benchmark (8 Candidate Methods)</p>
+      <p class="chart-subtitle">Independent evaluation across 12-month pre-holdout validation (Sep 2024–Aug 2025) and locked 12-month out-of-sample holdout test (Sep 2025–Aug 2026) on 320 monthly RSXFS observations</p>
     </div>
     <div class="table-card">
       <div class="table-responsive">
@@ -454,45 +454,45 @@ footer { border-top: 1px solid var(--border); padding: 32px 24px; margin-top: 48
           <thead>
             <tr>
               <th>Model Specification</th>
-              <th>Model Category</th>
+              <th>Category</th>
               <th style="text-align: right;">Validation MAE</th>
               <th style="text-align: right;">Validation MAPE</th>
               <th style="text-align: right;">Holdout Test MAE</th>
               <th style="text-align: right;">Holdout Test MAPE</th>
               <th style="text-align: right;">Holdout RMSE</th>
-              <th style="text-align: center;">Evaluation Note</th>
+              <th style="text-align: center;">Selection / Evaluation Status</th>
             </tr>
           </thead>
           <tbody>
             <tr class="selected-model-row">
+              <td><strong>Nonseasonal Holt</strong></td>
+              <td>State-Space Smoothing</td>
+              <td style="text-align: right;" class="stat-highlight">$7.318B</td>
+              <td style="text-align: right;" class="stat-highlight">1.21%</td>
+              <td style="text-align: right;">$8.017B</td>
+              <td style="text-align: right;">1.256%</td>
+              <td style="text-align: right;">$10.650B</td>
+              <td style="text-align: center;"><span class="badge-active" title="Selected on lowest validation MAE">Selected Model (Validation Winner)</span></td>
+            </tr>
+            <tr>
               <td><strong>Simple Drift</strong></td>
               <td>Empirical Baseline</td>
               <td style="text-align: right;">$7.677B</td>
               <td style="text-align: right;">1.27%</td>
-              <td style="text-align: right;" class="stat-highlight">$7.974B</td>
-              <td style="text-align: right;" class="stat-highlight">1.250%</td>
+              <td style="text-align: right;">$7.974B</td>
+              <td style="text-align: right;">1.250%</td>
               <td style="text-align: right;">$10.571B</td>
-              <td style="text-align: center;"><span class="badge-active">Top Holdout Performer</span></td>
+              <td style="text-align: center;"><span class="badge-alt" title="Top performer on subsequent holdout test window">Top Holdout Performer</span></td>
             </tr>
             <tr>
-              <td><strong>Nonseasonal Holt</strong></td>
+              <td><strong>Damped Nonseasonal Holt</strong></td>
               <td>State-Space Smoothing</td>
-              <td style="text-align: right;">$7.318B</td>
-              <td style="text-align: right;">1.21%</td>
-              <td style="text-align: right;">$8.017B</td>
-              <td style="text-align: right;">1.256%</td>
-              <td style="text-align: right;">$10.650B</td>
-              <td style="text-align: center;"><span class="badge-alt">Lowest Validation Error</span></td>
-            </tr>
-            <tr>
-              <td><strong>Production Holt-Winters</strong></td>
-              <td>Additive Trend &amp; Seasonality</td>
-              <td style="text-align: right;">$7.830B</td>
-              <td style="text-align: right;">1.23%</td>
-              <td style="text-align: right;">$7.830B</td>
-              <td style="text-align: right;">1.229%</td>
-              <td style="text-align: right;">$9.640B</td>
-              <td style="text-align: center;"><span class="badge-alt">Stored Pipeline Output</span></td>
+              <td style="text-align: right;">$8.014B</td>
+              <td style="text-align: right;">1.32%</td>
+              <td style="text-align: right;">$8.386B</td>
+              <td style="text-align: right;">1.314%</td>
+              <td style="text-align: right;">$11.195B</td>
+              <td style="text-align: center;"><span class="badge-alt">Additive Damped Trend</span></td>
             </tr>
             <tr>
               <td><strong>Additive Seasonal ETS</strong></td>
@@ -516,13 +516,13 @@ footer { border-top: 1px solid var(--border); padding: 32px 24px; margin-top: 48
             </tr>
             <tr>
               <td><strong>Last Value (Random Walk)</strong></td>
-              <td>Naive Baseline</td>
+              <td>Na&iuml;ve Baseline</td>
               <td style="text-align: right;">$15.380B</td>
               <td style="text-align: right;">2.54%</td>
               <td style="text-align: right;">$14.700B</td>
               <td style="text-align: right;">2.305%</td>
               <td style="text-align: right;">$18.977B</td>
-              <td style="text-align: center;"><span class="badge-alt">Reference</span></td>
+              <td style="text-align: center;"><span class="badge-alt">Reference Persistence</span></td>
             </tr>
             <tr>
               <td><strong>Seasonal Na&iuml;ve</strong></td>
@@ -546,6 +546,48 @@ footer { border-top: 1px solid var(--border); padding: 32px 24px; margin-top: 48
             </tr>
           </tbody>
         </table>
+      </div>
+      <div style="padding: 16px 20px; border-top: 1px solid var(--border); background: var(--bg-surface-2); font-size: 12px; line-height: 1.6; color: var(--text-2);">
+        <strong>Model Selection Procedure:</strong> <strong>Nonseasonal Holt</strong> was selected as the operational forecasting model because it achieved the lowest pre-holdout validation error ($7.318B MAE, 1.21% MAPE) during model tuning on the historical development period. On the subsequent locked 12-month holdout test window (Sep 2025–Aug 2026), <strong>Simple Drift</strong> performed slightly better ($7.974B MAE / 1.250% MAPE vs. $8.017B MAE / 1.256% MAPE for Holt). The holdout test actuals were quarantined until model selection was finalized to prevent data snooping; test-set ranking was not the selection procedure.
+      </div>
+    </div>
+
+    <!-- Separately Saved Production Forecast Section -->
+    <div class="chart-header" style="margin-top: 28px;">
+      <p class="chart-title">Separately Saved Production Forecast (Pipeline Artifact Verification)</p>
+      <p class="chart-subtitle">Audit of the production pipeline output (forecast_data.json) recomputed directly against the locked 12-month holdout actuals</p>
+    </div>
+    <div class="table-card">
+      <div class="table-responsive">
+        <table class="benchmark-table">
+          <thead>
+            <tr>
+              <th>Pipeline Artifact</th>
+              <th>Specification Details</th>
+              <th style="text-align: right;">Validation MAE</th>
+              <th style="text-align: right;">Validation MAPE</th>
+              <th style="text-align: right;">Holdout Test MAE</th>
+              <th style="text-align: right;">Holdout Test MAPE</th>
+              <th style="text-align: right;">Holdout RMSE</th>
+              <th style="text-align: center;">Audit Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Production Holt-Winters</strong></td>
+              <td>Additive Trend &amp; Seasonality (saved <code>forecast_data.json</code>)</td>
+              <td style="text-align: right; color: var(--text-muted); font-style: italic;">Not evaluated</td>
+              <td style="text-align: right; color: var(--text-muted); font-style: italic;">Not evaluated</td>
+              <td style="text-align: right;" class="stat-highlight">$7.830B</td>
+              <td style="text-align: right;" class="stat-highlight">1.229%</td>
+              <td style="text-align: right;">$9.928B</td>
+              <td style="text-align: center;"><span class="badge-active">Stored Pipeline Output</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="padding: 14px 20px; border-top: 1px solid var(--border); font-size: 11.5px; color: var(--text-muted); line-height: 1.5;">
+        *Note on validation columns: The saved production pipeline JSON was published as a forward operational artifact and evaluated directly against held-out actuals; no separate pre-holdout validation run exists for this specific saved JSON artifact, so validation columns are explicitly marked <em>Not evaluated</em>. The recomputed holdout RMSE is exactly $9.928B as verified by <code>stored_recomputed.RMSE_billions</code> in <code>reports/forecast_benchmark_results.json</code>.
       </div>
     </div>
   </div>
