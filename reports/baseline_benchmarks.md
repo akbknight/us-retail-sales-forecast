@@ -1,6 +1,6 @@
 # US Retail Demand Forecasting Benchmark & Baseline Comparison
 
-**Prepared:** October 2026 (Updated with Multi-Origin Evaluation Suite)  
+**Prepared:** October 2026 (Updated with Four-Origin 12-Month Horizon Suite)  
 **Author:** Akshay Kumar  
 **Target Codebase:** `us-retail-sales-forecast`  
 **Evaluation Script:** `scripts/forecast_compare.py`  
@@ -14,12 +14,12 @@
 ### Core Analytical Case Study (Question → Evidence → Result → Recommendation → Limitation)
 
 - **Question:** Does a complex seasonal state-space exponential smoothing architecture (`ETS(A,A,A)`) consistently outperform simpler econometric baselines on forward retail demand across multiple forecast origins?
-- **Evidence:** Evaluated the Federal Reserve Economic Data (FRED) monthly US Advance Retail Sales series (`RSXFS`, 320 monthly observations, January 2000 – August 2026, seasonally adjusted). Conducted both a locked 12-month fixed-origin holdout (September 2025 – August 2026) and a 4-horizon multi-origin evaluation suite (evaluating 12-month ahead projections across 2022–2023, 2023–2024, 2024–2025, and 2025–2026) spanning distinct post-pandemic inflationary and normalization regimes.
+- **Evidence:** Evaluated the Federal Reserve Economic Data (FRED) monthly US Advance Retail Sales series (`RSXFS`, 320 monthly observations, January 2000 – August 2026, seasonally adjusted). Conducted both a locked 12-month fixed-origin holdout (September 2025 – August 2026) and a 4-origin evaluation suite with a 12-month horizon (evaluating projections across Origin 1: 2022–2023, Origin 2: 2023–2024, Origin 3: 2024–2025, and Origin 4: 2025–2026) spanning post-pandemic inflationary shifts and normalization.
 - **Result:**
   1. **Fixed Holdout (Sep 2025–Aug 2026):** **Simple Drift** achieved **1.250% MAPE** ($7.974B MAE) and **Nonseasonal Holt** achieved **1.256% MAPE** ($8.017B MAE), outperforming Additive Seasonal ETS (1.367% MAPE, $8.715B MAE) and Seasonal Naive (3.739% MAPE, $23.640B MAE).
-  2. **Multi-Origin Cross-Validation (4 Horizons: 2022–2026):** Across all 4 historical forecast origins, **Nonseasonal Holt** achieved the lowest overall average error at **$9.078B Avg MAE (1.515% Avg MAPE)**, followed by **Additive Seasonal ETS ($9.129B Avg MAE, 1.519% Avg MAPE)** and **Simple Drift ($9.224B Avg MAE, 1.539% Avg MAPE)**. Nonseasonal state-space smoothing and drift baselines performed within 0.02% MAPE of the full seasonal specification across all four regimes.
+  2. **Multi-Origin Evaluation (Four Origins with a 12-Month Horizon):** Across the four origins, **Nonseasonal Holt** achieved the lowest mean MAE at **$9.078B Mean MAE (1.515% Mean MAPE)**, followed closely by **Additive Seasonal ETS ($9.129B Mean MAE, 1.519% Mean MAPE)** and **Simple Drift ($9.224B Mean MAE, 1.539% Mean MAPE)**. The difference between the top three specifications is extremely narrow (< 0.024% MAPE, or $0.146B MAE).
   3. **Production Model Verification:** Recomputation of the saved production pipeline output (`forecast_data.json`) verified the stored **1.2294% MAPE** ($7.830B MAE, $9.928B RMSE) calculation on the 12-month holdout window.
-- **Recommendation:** Adopt parsimonious nonseasonal baselines (Simple Drift or Nonseasonal Holt) as the primary evaluation standard for seasonally adjusted retail series. Do not assume seasonal complexity adds value without benchmarking against drift and state-space smoothing across multiple origins.
+- **Recommendation:** Adopt parsimonious nonseasonal baselines (Simple Drift or Nonseasonal Holt) as the primary evaluation standard for seasonally adjusted retail series. Benchmark seasonal models against drift and nonseasonal smoothing across multiple origins before assuming seasonal complexity is beneficial.
 - **Limitation:** Findings apply to the seasonally adjusted FRED `RSXFS` aggregate series. Macroeconomic regime shifts, sudden fiscal stimulus shocks, or disaggregated category-level volatility may require alternative structural or exogenous covariates.
 
 ---
@@ -39,11 +39,11 @@
 
 ---
 
-## 3. Multi-Origin Cross-Validation Suite (4 Horizons: 2022–2026)
+## 3. Multi-Origin Evaluation Suite (Four Origins with a 12-Month Horizon)
 
-Evaluated across 4 expanding 12-month forecast horizons (Origin 1: 2022–2023 · Origin 2: 2023–2024 · Origin 3: 2024–2025 · Origin 4: 2025–2026):
+Evaluated across four origins with a 12-month horizon (Origin 1: 2022–2023 · Origin 2: 2023–2024 · Origin 3: 2024–2025 · Origin 4: 2025–2026):
 
-| Model Specification | Model Category | 4-Origin Avg MAE | 4-Origin Avg MAPE | 4-Origin Avg RMSE |
+| Model Specification | Model Category | 4-Origin Mean MAE | 4-Origin Mean MAPE | 4-Origin Mean RMSE |
 |:---|:---|---:|---:|---:|
 | **Nonseasonal Holt** | State-Space Smoothing | **$9.078B** | **1.515%** | $10.583B |
 | Additive Seasonal ETS | Full State-Space ETS | $9.129B | 1.519% | $10.629B |
@@ -56,7 +56,29 @@ Evaluated across 4 expanding 12-month forecast horizons (Origin 1: 2022–2023 �
 
 ---
 
-## 4. Operational & Reproducibility Guide
+## 4. Per-Origin Detailed Results Breakdown
+
+Full per-origin evaluation metrics across all four 12-month horizons:
+
+| Model Specification | Origin 1: 2022–23 MAE (MAPE) | Origin 2: 2023–24 MAE (MAPE) | Origin 3: 2024–25 MAE (MAPE) | Origin 4: 2025–26 MAE (MAPE) | 4-Origin Mean MAE | 4-Origin Mean MAPE |
+|:---|---:|---:|---:|---:|---:|---:|
+| **Nonseasonal Holt** | $10.800B (1.858%) | $10.179B (1.739%) | $7.318B (1.206%) | $8.017B (1.256%) | **$9.078B** | **1.515%** |
+| Additive Seasonal ETS | $10.128B (1.741%) | $9.266B (1.583%) | $8.406B (1.386%) | $8.715B (1.367%) | $9.129B | 1.519% |
+| Simple Drift | $10.773B (1.853%) | $10.470B (1.789%) | $7.677B (1.266%) | $7.974B (1.250%) | $9.224B | 1.539% |
+| Last Value (Random Walk) | $4.458B (0.768%) | $3.402B (0.582%) | $15.380B (2.535%) | $14.699B (2.304%) | $9.485B | 1.547% |
+| Damped Seasonal ETS | $13.572B (2.333%) | $9.985B (1.705%) | $9.284B (1.531%) | $9.234B (1.449%) | $10.519B | 1.754% |
+| Damped Nonseasonal Holt | $14.856B (2.553%) | $11.101B (1.896%) | $8.014B (1.321%) | $8.385B (1.314%) | $10.589B | 1.771% |
+| Seasonal Naive | $15.690B (2.683%) | $5.620B (0.960%) | $18.347B (3.026%) | $23.639B (3.739%) | $15.824B | 2.602% |
+| Linear Trend (Full History) | $85.656B (14.669%) | $61.643B (10.514%) | $57.051B (9.434%) | $58.262B (9.254%) | $65.653B | 10.967% |
+
+### Empirical Nuance & Methodology Boundaries
+1. **Narrow Margins:** The difference between Nonseasonal Holt (1.515% Mean MAPE), Additive Seasonal ETS (1.519% Mean MAPE), and Simple Drift (1.539% Mean MAPE) is less than 0.024% MAPE ($0.146B MAE) across 48 evaluated months. These small differences do not establish universal superiority or prove that seasonality is universally unhelpful across other series or disaggregate data.
+2. **Regime Sensitivity:** In Origins 1 and 2, Additive Seasonal ETS achieved lower MAE than Holt and Drift, whereas in Origins 3 and 4, Holt and Drift achieved lower error.
+3. **Retrospective Robustness vs. Final Evaluation:** Multi-origin evaluation is a retrospective robustness check across past horizons; it is distinct from the locked, untouched final evaluation window (Sep 2025–Aug 2026) used for production validation.
+
+---
+
+## 5. Operational & Reproducibility Guide
 
 To reproduce this benchmark directly:
 ```bash
