@@ -14,11 +14,11 @@
 ### Core Analytical Case Study (Question → Evidence → Result → Recommendation → Limitation)
 
 - **Question:** Does a complex seasonal state-space exponential smoothing architecture (`ETS(A,A,A)`) consistently outperform simpler econometric baselines on forward retail demand across multiple forecast origins?
-- **Evidence:** Evaluated the Federal Reserve Economic Data (FRED) monthly US Advance Retail Sales series (`RSXFS`, 320 monthly observations, January 2000 – August 2026, seasonally adjusted). Conducted both a locked 12-month fixed-origin holdout (September 2025 – August 2026) and a 4-origin evaluation suite with a 12-month horizon (evaluating projections across Origin 1: 2022–2023, Origin 2: 2023–2024, Origin 3: 2024–2025, and Origin 4: 2025–2026) spanning post-pandemic inflationary shifts and normalization.
+- **Evidence:** Evaluated the Federal Reserve Economic Data (FRED) monthly US Advance Retail Sales series (`RSXFS`, 320 monthly observations, January 2000 – August 2026, seasonally adjusted). Conducted both an evaluation on the original historical holdout window (September 2025 – August 2026) and a retrospective 4-origin evaluation suite with a 12-month horizon (evaluating projections across Origin 1: 2022–2023, Origin 2: 2023–2024, Origin 3: 2024–2025, and Origin 4: 2025–2026) spanning post-pandemic inflationary shifts and normalization.
 - **Result:**
-  1. **Fixed Holdout (Sep 2025–Aug 2026):** **Simple Drift** achieved **1.250% MAPE** ($7.974B MAE) and **Nonseasonal Holt** achieved **1.256% MAPE** ($8.017B MAE), outperforming Additive Seasonal ETS (1.367% MAPE, $8.715B MAE) and Seasonal Naive (3.739% MAPE, $23.640B MAE).
-  2. **Multi-Origin Evaluation (Four Origins with a 12-Month Horizon):** Across the four origins, **Nonseasonal Holt** achieved the lowest mean MAE at **$9.078B Mean MAE (1.515% Mean MAPE)**, followed closely by **Additive Seasonal ETS ($9.129B Mean MAE, 1.519% Mean MAPE)** and **Simple Drift ($9.224B Mean MAE, 1.539% Mean MAPE)**. The difference between the top three specifications is extremely narrow (< 0.024% MAPE, or $0.146B MAE).
-  3. **Production Model Verification:** Recomputation of the saved production pipeline output (`forecast_data.json`) verified the stored **1.2294% MAPE** ($7.830B MAE, $9.928B RMSE) calculation on the 12-month holdout window.
+  1. **Original Historical Holdout (Sep 2025–Aug 2026):** **Simple Drift** achieved **1.250% MAPE** ($7.974B MAE) and **Nonseasonal Holt** achieved **1.256% MAPE** ($8.017B MAE), outperforming Additive Seasonal ETS (1.367% MAPE, $8.715B MAE) and Seasonal Naive (3.739% MAPE, $23.640B MAE).
+  2. **Retrospective Multi-Origin Evaluation (Four Origins with a 12-Month Horizon):** Across the four origins, **Nonseasonal Holt** achieved the lowest mean MAE at **$9.078B Mean MAE (1.515% Mean MAPE)**, followed closely by **Additive Seasonal ETS ($9.129B Mean MAE, 1.519% Mean MAPE)** and **Simple Drift ($9.224B Mean MAE, 1.539% Mean MAPE)**. The difference between the top three specifications is approximately 0.0245 percentage points ($0.146B MAE).
+  3. **Production Model Verification:** Recomputation of the saved production pipeline output (`forecast_data.json`) verified the stored **1.2294% MAPE** ($7.830B MAE, $9.928B RMSE) calculation on the original historical holdout window.
 - **Recommendation:** Adopt parsimonious nonseasonal baselines (Simple Drift or Nonseasonal Holt) as the primary evaluation standard for seasonally adjusted retail series. Benchmark seasonal models against drift and nonseasonal smoothing across multiple origins before assuming seasonal complexity is beneficial.
 - **Limitation:** Findings apply to the seasonally adjusted FRED `RSXFS` aggregate series. Macroeconomic regime shifts, sudden fiscal stimulus shocks, or disaggregated category-level volatility may require alternative structural or exogenous covariates.
 
@@ -39,7 +39,7 @@
 
 ---
 
-## 3. Multi-Origin Evaluation Suite (Four Origins with a 12-Month Horizon)
+## 3. Retrospective Multi-Origin Evaluation Suite (Four Origins with a 12-Month Horizon)
 
 Evaluated across four origins with a 12-month horizon (Origin 1: 2022–2023 · Origin 2: 2023–2024 · Origin 3: 2024–2025 · Origin 4: 2025–2026):
 
@@ -72,9 +72,9 @@ Full per-origin evaluation metrics across all four 12-month horizons:
 | Linear Trend (Full History) | $85.656B (14.669%) | $61.643B (10.514%) | $57.051B (9.434%) | $58.262B (9.254%) | $65.653B | 10.967% |
 
 ### Empirical Nuance & Methodology Boundaries
-1. **Narrow Margins:** The difference between Nonseasonal Holt (1.515% Mean MAPE), Additive Seasonal ETS (1.519% Mean MAPE), and Simple Drift (1.539% Mean MAPE) is less than 0.024% MAPE ($0.146B MAE) across 48 evaluated months. These small differences do not establish universal superiority or prove that seasonality is universally unhelpful across other series or disaggregate data.
+1. **Narrow Margins:** The difference between Nonseasonal Holt (1.515% Mean MAPE), Additive Seasonal ETS (1.519% Mean MAPE), and Simple Drift (1.539% Mean MAPE) is approximately 0.0245 percentage points ($0.146B MAE) across 48 evaluated months. These small differences do not establish universal superiority or prove that seasonality is universally unhelpful across other series or disaggregate data.
 2. **Regime Sensitivity:** In Origins 1 and 2, Additive Seasonal ETS achieved lower MAE than Holt and Drift, whereas in Origins 3 and 4, Holt and Drift achieved lower error.
-3. **Retrospective Robustness vs. Final Evaluation:** Multi-origin evaluation is a retrospective robustness check across past horizons; it is distinct from the locked, untouched final evaluation window (Sep 2025–Aug 2026) used for production validation.
+3. **Retrospective Multi-Origin Comparison vs. Original Historical Holdout:** Multi-origin evaluation is a retrospective robustness analysis across four historical 12-month horizons. The final window (September 2025 – August 2026) represents the original historical holdout; having been repeatedly inspected during benchmarking and validation, it cannot serve as untouched out-of-sample evidence for subsequent model iterations or adjustments. Any future model changes must be evaluated on genuinely new data releases or a separately justified evaluation design.
 
 ---
 
