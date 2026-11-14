@@ -26,9 +26,9 @@
     },
     {
       "model": "Linear trend",
-      "MAE_billions": 57.05134526899777,
-      "RMSE_billions": 57.186672610552485,
-      "MAPE_pct": 9.433715937300152
+      "MAE_billions": 57.051345268997856,
+      "RMSE_billions": 57.18667261055257,
+      "MAPE_pct": 9.433715937300168
     },
     {
       "model": "ETS additive seasonal",
@@ -118,5 +118,293 @@
     "holt_mape": 1.2562360039104123,
     "ets_mae": 8.715137139424343,
     "ets_mape": 1.3674319309091325
+  },
+  "multi_origin_benchmark": {
+    "origins": [
+      {
+        "name": "Origin 1 (2022-09 to 2023-08)",
+        "end_train": "2022-08-31",
+        "test_start": "2022-09-01",
+        "test_end": "2023-08-31"
+      },
+      {
+        "name": "Origin 2 (2023-09 to 2024-08)",
+        "end_train": "2023-08-31",
+        "test_start": "2023-09-01",
+        "test_end": "2024-08-31"
+      },
+      {
+        "name": "Origin 3 (2024-09 to 2025-08)",
+        "end_train": "2024-08-31",
+        "test_start": "2024-09-01",
+        "test_end": "2025-08-31"
+      },
+      {
+        "name": "Origin 4 (2025-09 to 2026-08)",
+        "end_train": "2025-08-31",
+        "test_start": "2025-09-01",
+        "test_end": "2026-08-31"
+      }
+    ],
+    "summary": [
+      {
+        "model": "Last value",
+        "avg_mae_billions": 9.484791666666649,
+        "avg_mape_pct": 1.5472491984205825,
+        "avg_rmse_billions": 11.322361286398234
+      },
+      {
+        "model": "Seasonal naive",
+        "avg_mae_billions": 15.823958333333337,
+        "avg_mape_pct": 2.602152902592236,
+        "avg_rmse_billions": 18.362959573785297
+      },
+      {
+        "model": "Drift",
+        "avg_mae_billions": 9.223555453813061,
+        "avg_mape_pct": 1.539332929371204,
+        "avg_rmse_billions": 10.727630258186679
+      },
+      {
+        "model": "Linear trend",
+        "avg_mae_billions": 65.6530701668982,
+        "avg_mape_pct": 10.967436327119378,
+        "avg_rmse_billions": 65.93558284693091
+      },
+      {
+        "model": "ETS additive seasonal",
+        "avg_mae_billions": 9.128793812659898,
+        "avg_mape_pct": 1.5193668827320514,
+        "avg_rmse_billions": 10.62891860144293
+      },
+      {
+        "model": "ETS damped seasonal",
+        "avg_mae_billions": 10.519092109931782,
+        "avg_mape_pct": 1.754452017736034,
+        "avg_rmse_billions": 12.260476296501896
+      },
+      {
+        "model": "Holt nonseasonal",
+        "avg_mae_billions": 9.078268745238452,
+        "avg_mape_pct": 1.5148442089506755,
+        "avg_rmse_billions": 10.582952839275174
+      },
+      {
+        "model": "Damped Holt nonseasonal",
+        "avg_mae_billions": 10.58910621904978,
+        "avg_mape_pct": 1.771036244691031,
+        "avg_rmse_billions": 12.30029702222618
+      }
+    ],
+    "per_origin_runs": {
+      "Last value": [
+        {
+          "MAE_billions": 4.458333333333305,
+          "RMSE_billions": 5.884557474157806,
+          "MAPE_pct": 0.7675254915815677,
+          "origin": "Origin 1 (2022-09 to 2023-08)"
+        },
+        {
+          "MAE_billions": 3.4016666666666424,
+          "RMSE_billions": 4.000924893071574,
+          "MAPE_pct": 0.5817255633662658,
+          "origin": "Origin 2 (2023-09 to 2024-08)"
+        },
+        {
+          "MAE_billions": 15.380000000000015,
+          "RMSE_billions": 16.427589090713646,
+          "MAPE_pct": 2.5352641794830197,
+          "origin": "Origin 3 (2024-09 to 2025-08)"
+        },
+        {
+          "MAE_billions": 14.699166666666628,
+          "RMSE_billions": 18.976373687649915,
+          "MAPE_pct": 2.304481559251477,
+          "origin": "Origin 4 (2025-09 to 2026-08)"
+        }
+      ],
+      "Seasonal naive": [
+        {
+          "MAE_billions": 15.690000000000007,
+          "RMSE_billions": 21.291841943179417,
+          "MAPE_pct": 2.6834899969601174,
+          "origin": "Origin 1 (2022-09 to 2023-08)"
+        },
+        {
+          "MAE_billions": 5.619999999999995,
+          "RMSE_billions": 7.166229831647886,
+          "MAPE_pct": 0.9597804914234805,
+          "origin": "Origin 2 (2023-09 to 2024-08)"
+        },
+        {
+          "MAE_billions": 18.346666666666675,
+          "RMSE_billions": 19.519723358695444,
+          "MAPE_pct": 3.026061507699538,
+          "origin": "Origin 3 (2024-09 to 2025-08)"
+        },
+        {
+          "MAE_billions": 23.639166666666664,
+          "RMSE_billions": 25.474043161618447,
+          "MAPE_pct": 3.7392796142858074,
+          "origin": "Origin 4 (2025-09 to 2026-08)"
+        }
+      ],
+      "Drift": [
+        {
+          "MAE_billions": 10.773130381303767,
+          "RMSE_billions": 12.328577339576528,
+          "MAPE_pct": 1.8531273465995,
+          "origin": "Origin 1 (2022-09 to 2023-08)"
+        },
+        {
+          "MAE_billions": 10.469976442873937,
+          "RMSE_billions": 11.431562805402598,
+          "MAPE_pct": 1.7887092036431282,
+          "origin": "Origin 2 (2023-09 to 2024-08)"
+        },
+        {
+          "MAE_billions": 7.677344632768363,
+          "RMSE_billions": 8.580118961375929,
+          "MAPE_pct": 1.2658101867643585,
+          "origin": "Origin 3 (2024-09 to 2025-08)"
+        },
+        {
+          "MAE_billions": 7.973770358306173,
+          "RMSE_billions": 10.570261926391659,
+          "MAPE_pct": 1.2496849804778285,
+          "origin": "Origin 4 (2025-09 to 2026-08)"
+        }
+      ],
+      "Linear trend": [
+        {
+          "MAE_billions": 85.65628020864881,
+          "RMSE_billions": 85.87767115774064,
+          "MAPE_pct": 14.668956228868765,
+          "origin": "Origin 1 (2022-09 to 2023-08)"
+        },
+        {
+          "MAE_billions": 61.64289265878543,
+          "RMSE_billions": 61.827241705796425,
+          "MAPE_pct": 10.513552470297217,
+          "origin": "Origin 2 (2023-09 to 2024-08)"
+        },
+        {
+          "MAE_billions": 57.051345268997856,
+          "RMSE_billions": 57.18667261055257,
+          "MAPE_pct": 9.433715937300168,
+          "origin": "Origin 3 (2024-09 to 2025-08)"
+        },
+        {
+          "MAE_billions": 58.26176253116071,
+          "RMSE_billions": 58.85074591363401,
+          "MAPE_pct": 9.253520672011364,
+          "origin": "Origin 4 (2025-09 to 2026-08)"
+        }
+      ],
+      "ETS additive seasonal": [
+        {
+          "MAE_billions": 10.128245462610826,
+          "RMSE_billions": 11.556739133504871,
+          "MAPE_pct": 1.7411969469811293,
+          "origin": "Origin 1 (2022-09 to 2023-08)"
+        },
+        {
+          "MAE_billions": 9.266272783466064,
+          "RMSE_billions": 10.29599914697405,
+          "MAPE_pct": 1.5826626930207324,
+          "origin": "Origin 2 (2023-09 to 2024-08)"
+        },
+        {
+          "MAE_billions": 8.405853198471695,
+          "RMSE_billions": 9.526536998196132,
+          "MAPE_pct": 1.3862271491593139,
+          "origin": "Origin 3 (2024-09 to 2025-08)"
+        },
+        {
+          "MAE_billions": 8.714803806091007,
+          "RMSE_billions": 11.13639912709666,
+          "MAPE_pct": 1.3673807417670298,
+          "origin": "Origin 4 (2025-09 to 2026-08)"
+        }
+      ],
+      "ETS damped seasonal": [
+        {
+          "MAE_billions": 13.5722983575048,
+          "RMSE_billions": 15.849800884053005,
+          "MAPE_pct": 2.332744078061813,
+          "origin": "Origin 1 (2022-09 to 2023-08)"
+        },
+        {
+          "MAE_billions": 9.985382117696199,
+          "RMSE_billions": 11.084842611063145,
+          "MAPE_pct": 1.7053694340608307,
+          "origin": "Origin 2 (2023-09 to 2024-08)"
+        },
+        {
+          "MAE_billions": 9.284272874686025,
+          "RMSE_billions": 10.30463530763238,
+          "MAPE_pct": 1.530961513035267,
+          "origin": "Origin 3 (2024-09 to 2025-08)"
+        },
+        {
+          "MAE_billions": 9.234415089840107,
+          "RMSE_billions": 11.802626383259053,
+          "MAPE_pct": 1.4487330457862255,
+          "origin": "Origin 4 (2025-09 to 2026-08)"
+        }
+      ],
+      "Holt nonseasonal": [
+        {
+          "MAE_billions": 10.799848701415092,
+          "RMSE_billions": 12.362511897325499,
+          "MAPE_pct": 1.8577386854593374,
+          "origin": "Origin 1 (2022-09 to 2023-08)"
+        },
+        {
+          "MAE_billions": 10.178755626683605,
+          "RMSE_billions": 11.120492429634641,
+          "MAPE_pct": 1.7389455533056333,
+          "origin": "Origin 2 (2023-09 to 2024-08)"
+        },
+        {
+          "MAE_billions": 7.317969978841944,
+          "RMSE_billions": 8.198720449633388,
+          "MAPE_pct": 1.2064544825393342,
+          "origin": "Origin 3 (2024-09 to 2025-08)"
+        },
+        {
+          "MAE_billions": 8.016500674013164,
+          "RMSE_billions": 10.650086580507166,
+          "MAPE_pct": 1.2562381144983972,
+          "origin": "Origin 4 (2025-09 to 2026-08)"
+        }
+      ],
+      "Damped Holt nonseasonal": [
+        {
+          "MAE_billions": 14.855835662379613,
+          "RMSE_billions": 16.934833813210787,
+          "MAPE_pct": 2.553223411056298,
+          "origin": "Origin 1 (2022-09 to 2023-08)"
+        },
+        {
+          "MAE_billions": 11.101360385285403,
+          "RMSE_billions": 12.133662078250982,
+          "MAPE_pct": 1.8963751959296375,
+          "origin": "Origin 2 (2023-09 to 2024-08)"
+        },
+        {
+          "MAE_billions": 8.013769797631406,
+          "RMSE_billions": 8.938041911779738,
+          "MAPE_pct": 1.3208693139768075,
+          "origin": "Origin 3 (2024-09 to 2025-08)"
+        },
+        {
+          "MAE_billions": 8.385459030902704,
+          "RMSE_billions": 11.194650285663215,
+          "MAPE_pct": 1.3136770578013819,
+          "origin": "Origin 4 (2025-09 to 2026-08)"
+        }
+      ]
+    }
   }
 }

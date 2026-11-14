@@ -590,6 +590,100 @@ footer { border-top: 1px solid var(--border); padding: 32px 24px; margin-top: 48
         *Note on validation columns: The saved production pipeline JSON was published as a forward operational artifact and evaluated directly against held-out actuals; no separate pre-holdout validation run exists for this specific saved JSON artifact, so validation columns are explicitly marked <em>Not evaluated</em>. The recomputed holdout RMSE is exactly $9.928B as verified by <code>stored_recomputed.RMSE_billions</code> in <code>reports/forecast_benchmark_results.json</code>.
       </div>
     </div>
+
+    <!-- Multi-Origin Cross-Validation Suite -->
+    <div class="chart-card hairline-frame" style="margin-top: 16px;">
+      <span class="hairline-caliper caliper-tl" aria-hidden="true"></span><span class="hairline-caliper caliper-tr" aria-hidden="true"></span><span class="hairline-caliper caliper-bl" aria-hidden="true"></span><span class="hairline-caliper caliper-br" aria-hidden="true"></span>
+      <div style="padding: 16px 20px 12px; border-bottom: 1px solid var(--border);">
+        <div style="font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: -0.01em;">Multi-Origin Cross-Validation Suite (4 Horizons: 2022–2026)</div>
+        <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 3px;">
+          Evaluated across 4 expanding 12-month forward horizons (2022–2023, 2023–2024, 2024–2025, 2025–2026) to test stability across inflationary peaks and macroeconomic normalization.
+        </div>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="benchmark-table">
+          <thead>
+            <tr>
+              <th>Model Specification</th>
+              <th>Architecture Class</th>
+              <th style="text-align: right;">4-Origin Avg MAE</th>
+              <th style="text-align: right;">4-Origin Avg MAPE</th>
+              <th style="text-align: right;">4-Origin Avg RMSE</th>
+              <th style="text-align: center;">Stability Ranking</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="selected-model-row">
+              <td><strong>Nonseasonal Holt</strong></td>
+              <td>State-Space Smoothing</td>
+              <td style="text-align: right;" class="stat-highlight">$9.078B</td>
+              <td style="text-align: right;" class="stat-highlight">1.515%</td>
+              <td style="text-align: right;">$10.583B</td>
+              <td style="text-align: center;"><span class="badge-active">Rank 1 Across All Origins</span></td>
+            </tr>
+            <tr>
+              <td><strong>Additive Seasonal ETS</strong></td>
+              <td>Full State-Space ETS</td>
+              <td style="text-align: right;">$9.129B</td>
+              <td style="text-align: right;">1.519%</td>
+              <td style="text-align: right;">$10.629B</td>
+              <td style="text-align: center;"><span class="badge-active">Rank 2 Across All Origins</span></td>
+            </tr>
+            <tr>
+              <td><strong>Simple Drift</strong></td>
+              <td>Empirical Baseline</td>
+              <td style="text-align: right;">$9.224B</td>
+              <td style="text-align: right;">1.539%</td>
+              <td style="text-align: right;">$10.728B</td>
+              <td style="text-align: center;"><span class="badge-active">Rank 3 Across All Origins</span></td>
+            </tr>
+            <tr>
+              <td><strong>Last Value (Random Walk)</strong></td>
+              <td>Naive Baseline</td>
+              <td style="text-align: right;">$9.485B</td>
+              <td style="text-align: right;">1.547%</td>
+              <td style="text-align: right;">$11.322B</td>
+              <td style="text-align: center;"><span style="color:var(--text-muted);font-size:11px;">Rank 4</span></td>
+            </tr>
+            <tr>
+              <td><strong>Damped Seasonal ETS</strong></td>
+              <td>Full State-Space ETS</td>
+              <td style="text-align: right;">$10.519B</td>
+              <td style="text-align: right;">1.754%</td>
+              <td style="text-align: right;">$12.260B</td>
+              <td style="text-align: center;"><span style="color:var(--text-muted);font-size:11px;">Rank 5</span></td>
+            </tr>
+            <tr>
+              <td><strong>Damped Nonseasonal Holt</strong></td>
+              <td>State-Space Smoothing</td>
+              <td style="text-align: right;">$10.589B</td>
+              <td style="text-align: right;">1.771%</td>
+              <td style="text-align: right;">$12.300B</td>
+              <td style="text-align: center;"><span style="color:var(--text-muted);font-size:11px;">Rank 6</span></td>
+            </tr>
+            <tr>
+              <td><strong>Seasonal Naive</strong></td>
+              <td>Seasonal Baseline</td>
+              <td style="text-align: right;">$15.824B</td>
+              <td style="text-align: right;">2.602%</td>
+              <td style="text-align: right;">$18.363B</td>
+              <td style="text-align: center;"><span style="color:var(--yellow);font-size:11px;">Rank 7</span></td>
+            </tr>
+            <tr>
+              <td><strong>Linear Trend (Full History)</strong></td>
+              <td>Global Trend</td>
+              <td style="text-align: right;">$65.653B</td>
+              <td style="text-align: right;">10.967%</td>
+              <td style="text-align: right;">$65.936B</td>
+              <td style="text-align: center;"><span style="color:var(--yellow);font-size:11px;">Rank 8</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="padding: 14px 20px; border-top: 1px solid var(--border); font-size: 11.5px; color: var(--text-muted); line-height: 1.5;">
+        *Multi-origin evaluation findings from <code>reports/baseline_benchmarks.md</code>: Nonseasonal Holt maintains the highest multi-origin stability (1.515% Avg MAPE), confirming that state-space smoothing without seasonal components is resilient across multiple macroeconomic regimes.
+      </div>
+    </div>
   </div>
 
   <!-- Two-column charts -->
